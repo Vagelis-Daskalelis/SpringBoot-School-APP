@@ -6,7 +6,9 @@ import com.vaggelis.SpringSchool.dto.SignUpRequest;
 import com.vaggelis.SpringSchool.exception.UserAlreadyExistsException;
 import com.vaggelis.SpringSchool.models.Role;
 import com.vaggelis.SpringSchool.models.Status;
+import com.vaggelis.SpringSchool.models.Teacher;
 import com.vaggelis.SpringSchool.models.User;
+import com.vaggelis.SpringSchool.repository.ITeacherRepository;
 import com.vaggelis.SpringSchool.repository.IUserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.Optional;
 public class AuthenticationServiceImpl implements IAuthenticationService{
 
     private final IUserRepository userRepository;
+    private final ITeacherRepository teacherRepository;
     private final PasswordEncoder passwordEncoder;
     private final IJWTService ijwtService;
     private final AuthenticationManager authenticationManager;
@@ -53,13 +56,21 @@ public class AuthenticationServiceImpl implements IAuthenticationService{
         Optional<User> admin = userRepository.findByRole(Role.ADMIN);
         if (admin.isEmpty()){
             User user = new User();
-            user.setFirstname("admin");
-            user.setLastname("admin");
             user.setUname("admin");
             user.setPassword(passwordEncoder.encode("admin"));
             user.setEmail("admin@gmail.com");
             user.setRole(Role.ADMIN);
             user.setStatus(Status.ACTIVE);
+
+            Teacher teacher = new Teacher();
+            teacher.setFirstname("admin");
+            teacher.setLastname("admin");
+
+           teacher.addUser(user);
+
+           teacherRepository.save(teacher);
+
+
             userRepository.save(user);
             System.out.println("Admin created successfully");
             log.info("Admin created successfully");

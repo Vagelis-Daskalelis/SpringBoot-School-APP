@@ -22,8 +22,6 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String firstname;
-    private String lastname;
     private String uname;
     private String password;
     private String email;
@@ -32,6 +30,12 @@ public class User implements UserDetails {
     private Role role;
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @OneToOne(mappedBy = "user")
+    private Teacher teacher;
+
+    @OneToOne(mappedBy = "user")
+    private Student student;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -78,7 +82,29 @@ public class User implements UserDetails {
 
 
 
-//    // --- Lifecycle callbacks ---
+    public static User getNewUserWithAdminRole(String uname, String password, String email){
+        return new User(null, uname, password, email, Role.ADMIN, Status.ACTIVE);
+    }
+
+    public static User getNewUserWithTeacherRole(String uname, String password, String email){
+        return new User(null, uname, password, email, Role.TEACHER, Status.ACTIVE);
+    }
+
+    public static User getNewUserWithStudentRole(String uname, String password, String email){
+        return new User(null, uname, password, email, Role.STUDENT, Status.ACTIVE);
+    }
+
+    public User(Long id, String uname, String password, String email, Role role, Status status) {
+        this.id = id;
+        this.uname = uname;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+        this.status = status;
+    }
+
+
+    //    // --- Lifecycle callbacks ---
 //    @PrePersist
 //    public void onCreate() {
 //        this.createdAt = LocalDateTime.now();
