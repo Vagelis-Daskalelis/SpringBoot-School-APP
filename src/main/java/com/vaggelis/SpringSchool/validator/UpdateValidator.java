@@ -27,9 +27,9 @@ public class UpdateValidator implements Validator {
             errors.rejectValue("lastname", "lastname.size", "Lastname must be between 3 and 20 characters.");
         }
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "uname", "uname.empty", "Username is required.");
-        if (request.getUname() != null && (request.getUname().length() < 3 || request.getUname().length() > 20)) {
-            errors.rejectValue("uname", "uname.size", "Username must be between 3 and 20 characters.");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "username.empty", "Username is required.");
+        if (request.getUsername() != null && (request.getUsername().length() < 3 || request.getUsername().length() > 20)) {
+            errors.rejectValue("username", "username.size", "Username must be between 3 and 20 characters.");
         }
 
         // --- Password ---

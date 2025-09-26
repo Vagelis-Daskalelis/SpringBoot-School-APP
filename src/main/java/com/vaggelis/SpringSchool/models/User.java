@@ -22,7 +22,7 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String uname;
+    private String username;
     private String password;
     private String email;
 
@@ -31,11 +31,11 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToOne(mappedBy = "user")
-    private Teacher teacher;
-
-    @OneToOne(mappedBy = "user")
-    private Student student;
+//    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+//    private Teacher teacher;
+//
+//    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+//    private Student student;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -86,17 +86,17 @@ public class User implements UserDetails {
         return new User(null, uname, password, email, Role.ADMIN, Status.ACTIVE);
     }
 
-    public static User getNewUserWithTeacherRole(String uname, String password, String email){
-        return new User(null, uname, password, email, Role.TEACHER, Status.ACTIVE);
+    public static User getNewUserWithTeacherRole(String username, String password, String email){
+        return new User(null, username, password, email, Role.TEACHER, Status.ACTIVE);
     }
 
-    public static User getNewUserWithStudentRole(String uname, String password, String email){
-        return new User(null, uname, password, email, Role.STUDENT, Status.ACTIVE);
+    public static User getNewUserWithStudentRole(String username, String password, String email){
+        return new User(null, username, password, email, Role.STUDENT, Status.ACTIVE);
     }
 
-    public User(Long id, String uname, String password, String email, Role role, Status status) {
+    public User(Long id, String username, String password, String email, Role role, Status status) {
         this.id = id;
-        this.uname = uname;
+        this.username = username;
         this.password = password;
         this.email = email;
         this.role = role;

@@ -15,7 +15,7 @@ import lombok.Setter;
 public class UserReadDTO {
     private String firstname;
     private String lastname;
-    private String uname;
+    private String username;
     private String email;
     private String password;
 }

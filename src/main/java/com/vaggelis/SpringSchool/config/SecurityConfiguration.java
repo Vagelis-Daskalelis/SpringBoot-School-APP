@@ -1,5 +1,6 @@
 package com.vaggelis.SpringSchool.config;
 
+import com.vaggelis.SpringSchool.models.Role;
 import com.vaggelis.SpringSchool.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 import java.util.List;
 
@@ -46,10 +49,10 @@ public class SecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/resource/student/**").hasAnyAuthority("TEACHER", "ADMIN")
-                        .requestMatchers("/api/v1/resource/teacher/**").hasAnyAuthority("TEACHER", "ADMIN")
-                        .requestMatchers("/api/v1/resource/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/v1/resource/**").permitAll()
+                        .requestMatchers("/api/v1/resource/user/**").hasAuthority("STUDENT")
+                        .requestMatchers("/api/v1/resource/manager/**").hasAnyAuthority("TEACHER", "ADMIN")
+                        .requestMatchers("/api/v1/auth/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
