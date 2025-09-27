@@ -103,6 +103,17 @@ public class User implements UserDetails {
         this.status = status;
     }
 
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                ", status=" + status +
+                '}';
+    }
 
     //    // --- Lifecycle callbacks ---
 //    @PrePersist

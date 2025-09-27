@@ -1,5 +1,7 @@
 package com.vaggelis.SpringSchool.dto;
 
+import com.vaggelis.SpringSchool.models.Role;
+import com.vaggelis.SpringSchool.models.Status;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -13,9 +15,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserReadDTO {
-    private String firstname;
-    private String lastname;
+    private Long id;
     private String username;
     private String email;
     private String password;
+    private Role role;
+    private Status status;
 }

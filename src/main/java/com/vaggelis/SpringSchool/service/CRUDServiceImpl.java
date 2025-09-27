@@ -3,10 +3,8 @@ package com.vaggelis.SpringSchool.service;
 import com.vaggelis.SpringSchool.dto.JWTAuthenticationResponse;
 import com.vaggelis.SpringSchool.dto.SignInRequest;
 import com.vaggelis.SpringSchool.dto.SignUpRequest;
-import com.vaggelis.SpringSchool.exception.StudentAlreadyExistsException;
-import com.vaggelis.SpringSchool.exception.TeacherAlreadyExistsException;
-import com.vaggelis.SpringSchool.exception.UserAlreadyExistsException;
-import com.vaggelis.SpringSchool.mapper.UserMapper;
+import com.vaggelis.SpringSchool.exception.*;
+import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.*;
 import com.vaggelis.SpringSchool.repository.IStudentRepository;
 import com.vaggelis.SpringSchool.repository.ITeacherRepository;
@@ -19,12 +17,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AuthenticationServiceImpl implements IAuthenticationService{
+public class CRUDServiceImpl implements ICRUDService {
 
     private final IUserRepository userRepository;
     private final ITeacherRepository teacherRepository;
@@ -33,14 +32,15 @@ public class AuthenticationServiceImpl implements IAuthenticationService{
     private final IJWTService ijwtService;
     private final AuthenticationManager authenticationManager;
 
+    //Creates a Student
     @Override
-    public void studentSignUp(SignUpRequest request) throws StudentAlreadyExistsException {
+    public Student studentSignUp(SignUpRequest request) throws StudentAlreadyExistsException {
         User user;
         Student student;
 
         try {
-            student = UserMapper.extractStudentFromSignUpRequest(request);
-            user = UserMapper.extractUserWithStudentRoleFromSignUpRequest(request, passwordEncoder);
+            student = Mapper.extractStudentFromSignUpRequest(request);
+            user = Mapper.extractUserWithStudentRoleFromSignUpRequest(request, passwordEncoder);
 
             Optional<User> returnedUser = userRepository.findByEmail(request.getEmail());
 
@@ -49,33 +49,24 @@ public class AuthenticationServiceImpl implements IAuthenticationService{
             student.addUser(user);
             studentRepository.save(student);
 
-            log.info("Student added");
+            log.info("Student user added: {}", user.getEmail());
+            log.info("Student added: {}, {}" , student.getFirstname(), student.getLastname());
         }catch (StudentAlreadyExistsException e){
             log.error(e.getMessage());
             throw e;
         }
-        //return student;
+        return student;
     }
 
+    //Creates a Teacher
     @Override
-    public JWTAuthenticationResponse SignIn(SignInRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
-        var jwt = ijwtService.generateToken(user);
-        log.info("User logged in" , request.getEmail());
-        return  JWTAuthenticationResponse.builder().token(jwt).build();
-    }
-
-    @Override
-    public void teacherSignUp(SignUpRequest request) throws TeacherAlreadyExistsException {
+    public Teacher teacherSignUp(SignUpRequest request) throws TeacherAlreadyExistsException {
         User user;
         Teacher teacher;
 
         try {
-            teacher = UserMapper.extractTeacherFromSignUpRequest(request);
-            user = UserMapper.extractUserWithTeacherRoleFromSignUpRequest(request, passwordEncoder);
+            teacher = Mapper.extractTeacherFromSignUpRequest(request);
+            user = Mapper.extractUserWithTeacherRoleFromSignUpRequest(request, passwordEncoder);
 
             Optional<User> returnedUser = userRepository.findByEmail(request.getEmail());
 
@@ -84,13 +75,14 @@ public class AuthenticationServiceImpl implements IAuthenticationService{
             teacher.addUser(user);
             teacherRepository.save(teacher);
 
-            log.info("Teacher added");
+            log.info("Teacher user added: {}", user.getEmail());
+            log.info("Teacher added: {} , {}", teacher.getFirstname(), teacher.getLastname());
         }catch (TeacherAlreadyExistsException e){
             log.error(e.getMessage());
             throw e;
         }
 
-        //return teacher;
+        return teacher;
     }
 
 
@@ -118,17 +110,34 @@ public class AuthenticationServiceImpl implements IAuthenticationService{
 //        }
 //    }
 
+
+    //Signs in
+    @Override
+    public JWTAuthenticationResponse SignIn(SignInRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+        var jwt = ijwtService.generateToken(user);
+        log.info("User logged in {} with email: " , request.getEmail());
+        return  JWTAuthenticationResponse.builder().token(jwt).build();
+    }
+
+
+
+    //Logs out
     @Override
     public void logout(String email) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isPresent()){
             User user = userOpt.get();
-            log.info("User logged out", email);
+            log.info("User logged out: {}", email);
         }else {
             throw new IllegalArgumentException("User not found with email: " + email);
         }
     }
 
+    //Creates a admin when the application is starting
     @PostConstruct
     public void createAdmin(){
         Optional<User> admin = userRepository.findByRole(Role.ADMIN);
@@ -154,5 +163,96 @@ public class AuthenticationServiceImpl implements IAuthenticationService{
             System.out.println("Admin already exists");
             log.info("Admin already exists");
         }
+    }
+
+
+
+
+    //Finds User by email
+    @Override
+    public User findUserByEmail(String email) throws UserNotFoundException {
+        User user;
+
+        try {
+            user = userRepository.findUserByEmail(email);
+            if (user == null) throw new UserNotFoundException(User.class, user.getId());
+        }catch (UserNotFoundException e){
+            throw e;
+        }
+        return user;
+    }
+
+    //Finds all Users
+    @Override
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public Teacher findTeacherByLastname(String lastname) throws TeacherNotFoundException {
+        Teacher teacher;
+
+        try {
+            teacher = teacherRepository.findTeacherByLastname(lastname);
+            if (teacher == null) throw new TeacherNotFoundException(Teacher.class, teacher.getId());
+        }catch (TeacherNotFoundException e){
+            throw e;
+        }
+        return teacher;
+    }
+
+    //Finds all Teachers
+    @Override
+    public List<Teacher> findAllTeachers() {
+        return teacherRepository.findAll();
+    }
+
+    @Override
+    public Student findStudentByLastname(String lastname) throws StudentNotFoundException {
+        Student student;
+
+        try {
+            student = studentRepository.findStudentByLastname(lastname);
+            if (student == null) throw new StudentNotFoundException(Student.class, student.getId());
+        }catch (StudentNotFoundException e){
+            throw e;
+        }
+        return student;
+    }
+
+    //Finds all Students
+    @Override
+    public List<Student> findAllStudents() {
+        return studentRepository.findAll();
+    }
+
+    //Deletes a teacher by its id
+    @Override
+    public Teacher deleteTeacher(Long id) throws TeacherNotFoundException {
+        Teacher teacher;
+
+        try {
+            teacher = teacherRepository.findTeacherById(id);
+            if (teacher == null) throw new TeacherNotFoundException(Teacher.class, teacher.getId());
+            teacherRepository.delete(teacher);
+        }catch (TeacherNotFoundException e){
+            throw e;
+        }
+        return teacher;
+    }
+
+    //Deletes a student by its id
+    @Override
+    public Student deleteStudent(Long id) throws StudentNotFoundException {
+        Student student;
+
+        try {
+            student = studentRepository.findStudentById(id);
+            if (student == null) throw new StudentNotFoundException(Student.class, student.getId());
+            studentRepository.delete(student);
+        }catch (StudentNotFoundException e){
+            throw e;
+        }
+        return student;
     }
 }

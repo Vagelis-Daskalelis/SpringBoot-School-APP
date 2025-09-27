@@ -2,7 +2,7 @@ package com.vaggelis.SpringSchool.controller;
 
 import com.vaggelis.SpringSchool.dto.JWTAuthenticationResponse;
 import com.vaggelis.SpringSchool.dto.SignInRequest;
-import com.vaggelis.SpringSchool.service.IAuthenticationService;
+import com.vaggelis.SpringSchool.service.ICRUDService;
 import com.vaggelis.SpringSchool.validator.SignUpValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthorizationController {
 
-    private final IAuthenticationService authenticationService;
+    private final ICRUDService crudService;
     private final SignUpValidator validator;
     private final PasswordEncoder passwordEncoder;
 
 
     @PostMapping("/signin")
     public ResponseEntity<JWTAuthenticationResponse> signIn(@RequestBody SignInRequest request){
-        return ResponseEntity.ok(authenticationService.SignIn(request));
+        return ResponseEntity.ok(crudService.SignIn(request));
     }
 }
