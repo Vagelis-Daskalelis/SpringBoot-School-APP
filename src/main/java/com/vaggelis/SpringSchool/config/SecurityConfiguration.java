@@ -50,9 +50,9 @@ public class SecurityConfiguration {
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers("/api/v1/resource/**").permitAll()
-                        .requestMatchers("/api/v1/resource/user/**").hasAuthority("STUDENT")
-                        .requestMatchers("/api/v1/resource/manager/**").hasAnyAuthority("TEACHER", "ADMIN")
-                        .requestMatchers("/api/v1/auth/admin/**").hasAuthority("ADMIN")
+                        .requestMatchers("/api/student/**").hasAuthority("STUDENT")
+                        .requestMatchers("/api/teacher/**").hasAnyAuthority("TEACHER", "ADMIN")
+                        .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

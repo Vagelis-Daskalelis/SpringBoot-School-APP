@@ -17,10 +17,12 @@ public interface ICRUDService {
     public void logout(String email);
     User findUserByEmail(String email) throws UserNotFoundException;
     List<User> findAllUsers();
-    Teacher findTeacherByLastname(String lastname) throws TeacherNotFoundException;
+    Teacher findTeacherById(Long id) throws TeacherNotFoundException;
     List<Teacher> findAllTeachers();
-    Student findStudentByLastname(String lastname) throws StudentNotFoundException;
+    Student findStudentById(Long id) throws StudentNotFoundException;
     List<Student> findAllStudents();
     Teacher deleteTeacher(Long id) throws TeacherNotFoundException;
     Student deleteStudent(Long id) throws StudentNotFoundException;
+    Student seeYourProfile(Long targetId) throws StudentNotFoundException;
+
 }

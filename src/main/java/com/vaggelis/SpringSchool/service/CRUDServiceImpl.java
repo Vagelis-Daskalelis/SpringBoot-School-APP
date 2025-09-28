@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -189,11 +190,11 @@ public class CRUDServiceImpl implements ICRUDService {
     }
 
     @Override
-    public Teacher findTeacherByLastname(String lastname) throws TeacherNotFoundException {
+    public Teacher findTeacherById(Long id) throws TeacherNotFoundException {
         Teacher teacher;
 
         try {
-            teacher = teacherRepository.findTeacherByLastname(lastname);
+            teacher = teacherRepository.findTeacherById(id);
             if (teacher == null) throw new TeacherNotFoundException(Teacher.class, teacher.getId());
         }catch (TeacherNotFoundException e){
             throw e;
@@ -208,11 +209,11 @@ public class CRUDServiceImpl implements ICRUDService {
     }
 
     @Override
-    public Student findStudentByLastname(String lastname) throws StudentNotFoundException {
+    public Student findStudentById(Long id) throws StudentNotFoundException {
         Student student;
 
         try {
-            student = studentRepository.findStudentByLastname(lastname);
+            student = studentRepository.findStudentById(id);
             if (student == null) throw new StudentNotFoundException(Student.class, student.getId());
         }catch (StudentNotFoundException e){
             throw e;
@@ -255,4 +256,87 @@ public class CRUDServiceImpl implements ICRUDService {
         }
         return student;
     }
+
+
+
+    //Find the students profile that matches his id
+    @Override
+    public Student seeYourProfile(Long targetId) throws StudentNotFoundException {
+        // Get the logged-in user's email from the JWT authentication context
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Find the logged-in user
+        User currentUser = userRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Make sure the logged-in user is actually a student
+        Student targetStudent = studentRepository.findById(targetId)
+                .orElseThrow(() -> new StudentNotFoundException(Student.class, targetId));
+
+        if (!targetStudent.getUser().getId().equals(currentUser.getId())) {
+            throw new SecurityException("You are not authorized to see this profile");
+        }
+
+        return targetStudent;
+    }
+
+
+
+    //Even simpler (no targetId)
+    //
+    //If the endpoint is only for the logged-in student, you can drop targetId completely:
+//    @Override
+//    public Student seeYourProfile() throws StudentNotFoundException {
+//        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+//
+//        User currentUser = userRepository.findByEmail(currentUserEmail)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        return studentRepository.findByUser(currentUser)
+//                .orElseThrow(() -> new StudentNotFoundException(Student.class, currentUser.getId()));
+//    }
 }
+
+
+/**
+ *     // updates the user that you are logged in
+ *     @Override
+ *     public User updateYourUser(UpdateRequest request, Long targetUserId, Long currentUserId) throws UserNotFoundException {
+ *         if (!targetUserId.equals(currentUserId)){
+ *             throw new SecurityException("You are not authorized to update this user.");
+ *         }
+ *         User targetUser = null;
+ *         try {
+ *             targetUser = userRepository.findById(targetUserId)
+ *                     .orElseThrow(() -> new UserNotFoundException(User.class, targetUserId));
+ *
+ *             targetUser.setUname(request.getUname());
+ *             targetUser.setEmail(request.getEmail());
+ *             targetUser.setPassword(passwordEncoder.encode(request.getPassword()));
+ *
+ *             userRepository.save(targetUser);
+ *         } catch (UserNotFoundException e) {
+ *             throw e;
+ *         }
+ *
+ *         return targetUser;
+ *     }
+ *
+ *     // deletes the user that you are logged in
+ *     @Override
+ *     public User deleteYourUser(Long targetUserId, Long currentUserId) throws UserNotFoundException {
+ *         if (!targetUserId.equals(currentUserId)){
+ *             throw new SecurityException("You are not authorized to update this user.");
+ *         }
+ *         try {
+ *             User targetUser = userRepository.findById(targetUserId)
+ *                     .orElseThrow(() -> new UserNotFoundException(User.class, targetUserId));
+ *
+ *             userRepository.delete(targetUser);
+ *             return targetUser;
+ *         } catch (UserNotFoundException e) {
+ *             throw e;
+ *         }
+ *
+ *     }
+ */

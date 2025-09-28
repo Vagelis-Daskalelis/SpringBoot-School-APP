@@ -22,18 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/auth/admin")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
-public class AuthenticationController {
+public class AdminController {
 
     private final ICRUDService crudService;
     private final SignUpValidator validator;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/string")
-    public void getMessage(){
+    public ResponseEntity<String> getMessage(){
         System.out.println("It works");
-
+        return ResponseEntity.ok("It works");
     }
 
     //Creates a Teacher
@@ -57,27 +57,6 @@ public class AuthenticationController {
         }
     }
 
-    //Creates a Student
-    @PostMapping("/signUp/student")
-    public ResponseEntity<StudentReadDTO> signUpStudent(@Valid @RequestBody SignUpRequest request, BindingResult bindingResult){
-        validator.validate(request, bindingResult);
-        if (bindingResult.hasErrors()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        try {
-            Student student = crudService.studentSignUp(request);
-            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(readDTO.getId())
-                    .toUri();
-
-            return  ResponseEntity.created(location).body(readDTO);
-        }catch (StudentAlreadyExistsException e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
 
     @PostMapping("/signin")
     public ResponseEntity<JWTAuthenticationResponse> signIn(@RequestBody SignInRequest request){
@@ -97,29 +76,6 @@ public class AuthenticationController {
         }
     }
 
-    //Finds a teacher by the lastname
-    @GetMapping("/teacher/{lastname}")
-    public ResponseEntity<TeacherReadDTO> findTeacher(@PathVariable String lastname){
-        try {
-            Teacher teacher = crudService.findTeacherByLastname(lastname);
-            TeacherReadDTO readDTO = Mapper.mappingTeacherToReadDto(teacher);
-            return new ResponseEntity<>(readDTO, HttpStatus.OK);
-        }catch (TeacherNotFoundException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    //Finds a student by the lastname
-    @GetMapping("/student/{lastname}")
-    public ResponseEntity<StudentReadDTO> findStudent(@PathVariable String lastname){
-        try {
-            Student student = crudService.findStudentByLastname(lastname);
-            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
-            return new ResponseEntity<>(readDTO, HttpStatus.OK);
-        }catch (StudentNotFoundException e){
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
 
     //Finds all users
     @GetMapping("/user/all")
@@ -140,43 +96,6 @@ public class AuthenticationController {
         }
     }
 
-    //Finds all teachers
-    @GetMapping("/teacher/all")
-    public ResponseEntity<List<TeacherReadDTO>> findAllTeachers(){
-        List<Teacher> teachers;
-
-        try {
-            teachers = crudService.findAllTeachers();
-            List<TeacherReadDTO> readDTOS = new ArrayList<>();
-
-            for (Teacher teacher : teachers){
-                readDTOS.add(Mapper.mappingTeacherToReadDto(teacher));
-            }
-
-            return new ResponseEntity<>(readDTOS, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    //Finds all students
-    @GetMapping("/student/all")
-    public ResponseEntity<List<StudentReadDTO>> findAllStudents(){
-        List<Student> students;
-
-        try {
-            students = crudService.findAllStudents();
-            List<StudentReadDTO> readDTOS = new ArrayList<>();
-
-            for (Student student : students){
-                readDTOS.add(Mapper.mappingStudentToReadDto(student));
-            }
-
-            return new ResponseEntity<>(readDTOS, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-    }
 
     @DeleteMapping("/teacher/delete/{id}")
     public ResponseEntity<Teacher> deleteTeacher(@PathVariable Long id){
