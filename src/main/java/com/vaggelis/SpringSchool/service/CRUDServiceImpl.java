@@ -3,6 +3,7 @@ package com.vaggelis.SpringSchool.service;
 import com.vaggelis.SpringSchool.dto.JWTAuthenticationResponse;
 import com.vaggelis.SpringSchool.dto.SignInRequest;
 import com.vaggelis.SpringSchool.dto.SignUpRequest;
+import com.vaggelis.SpringSchool.dto.UpdateRequest;
 import com.vaggelis.SpringSchool.exception.*;
 import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.*;
@@ -258,6 +259,40 @@ public class CRUDServiceImpl implements ICRUDService {
     }
 
 
+    //Updates a Student
+    @Override
+    public Student updateStudentAndUser(UpdateRequest request) throws StudentNotFoundException {
+        User user;
+        User updatedUser;
+        Student student;
+        Student updatedStudent;
+
+        try {
+            student = studentRepository.findStudentById(request.getId());
+            if (student == null) throw new StudentNotFoundException(Student.class, request.getId());
+
+            updatedUser = Mapper.extractUserFromUpdateRequest(student, request, passwordEncoder);
+            updatedStudent = Mapper.extractStudentFromUpdateRequest(request, updatedUser);
+
+
+            studentRepository.save(updatedStudent);
+        }catch (StudentNotFoundException e){
+            throw e;
+        }
+        return updatedStudent;
+    }
+
+    @Override
+    public Student updateStudent(UpdateRequest request) throws StudentNotFoundException {
+        Student student = studentRepository.findStudentById(request.getId());
+        if (student == null) throw new StudentNotFoundException(Student.class, request.getId());
+
+        // Use the mapper to update only student fields
+        Mapper.updateStudentFromRequest(student, request);
+
+        return studentRepository.save(student);
+    }
+
 
     //Find the students profile that matches his id
     @Override
@@ -278,6 +313,9 @@ public class CRUDServiceImpl implements ICRUDService {
         }
 
         return targetStudent;
+
+
+
     }
 
 

@@ -1,21 +1,24 @@
 package com.vaggelis.SpringSchool.validator;
 
 import com.vaggelis.SpringSchool.dto.SignUpRequest;
+import com.vaggelis.SpringSchool.dto.UpdateRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
+@Component
 public class UpdateValidator implements Validator {
 
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return SignUpRequest.class == clazz;
+        return UpdateRequest.class == clazz;
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        SignUpRequest request = (SignUpRequest) target;
+        UpdateRequest request = (UpdateRequest) target;
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstname", "firstname.empty", "Firstname is required.");
         if (request.getFirstname() != null && (request.getFirstname().length() < 3 || request.getFirstname().length() > 20)) {

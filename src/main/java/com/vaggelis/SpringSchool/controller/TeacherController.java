@@ -3,6 +3,7 @@ package com.vaggelis.SpringSchool.controller;
 import com.vaggelis.SpringSchool.dto.SignUpRequest;
 import com.vaggelis.SpringSchool.dto.StudentReadDTO;
 import com.vaggelis.SpringSchool.dto.TeacherReadDTO;
+import com.vaggelis.SpringSchool.dto.UpdateRequest;
 import com.vaggelis.SpringSchool.exception.StudentAlreadyExistsException;
 import com.vaggelis.SpringSchool.exception.StudentNotFoundException;
 import com.vaggelis.SpringSchool.exception.TeacherNotFoundException;
@@ -11,6 +12,7 @@ import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.models.Teacher;
 import com.vaggelis.SpringSchool.service.ICRUDService;
 import com.vaggelis.SpringSchool.validator.SignUpValidator;
+import com.vaggelis.SpringSchool.validator.UpdateValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,14 +32,15 @@ import java.util.List;
 public class TeacherController {
 
     private final ICRUDService crudService;
-    private final SignUpValidator validator;
+    private final SignUpValidator signUpValidator;
+    private final UpdateValidator updateValidator;
     private final PasswordEncoder passwordEncoder;
 
 
     //Creates a Student
     @PostMapping("/signUp/student")
     public ResponseEntity<StudentReadDTO> signUpStudent(@Valid @RequestBody SignUpRequest request, BindingResult bindingResult){
-        validator.validate(request, bindingResult);
+        signUpValidator.validate(request, bindingResult);
         if (bindingResult.hasErrors()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -52,6 +55,39 @@ public class TeacherController {
             return  ResponseEntity.created(location).body(readDTO);
         }catch (StudentAlreadyExistsException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    //Update a Student
+    @PutMapping("/update/studentanduser")
+    public ResponseEntity<StudentReadDTO> updateStudentAndUser(@Valid @RequestBody UpdateRequest request, BindingResult bindingResult){
+        updateValidator.validate(request, bindingResult);
+        if (bindingResult.hasErrors()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Student student = crudService.updateStudentAndUser(request);
+            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
+            return new ResponseEntity<>(readDTO, HttpStatus.OK);
+        }catch (StudentNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/update/student")
+    public ResponseEntity<StudentReadDTO> updateStudent(@Valid @RequestBody UpdateRequest request, BindingResult bindingResult){
+        updateValidator.validate(request, bindingResult);
+        if (bindingResult.hasErrors()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Student student = crudService.updateStudent(request);
+            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
+            return new ResponseEntity<>(readDTO, HttpStatus.OK);
+        }catch (StudentNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 

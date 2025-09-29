@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateRequest {
     @NotNull
+    Long id;
+    @NotNull
     @Size(min = 3, max = 20)
     private String firstname;
     @NotNull
@@ -24,6 +26,7 @@ public class UpdateRequest {
     private String username;
     @NotNull
     @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "Wrong email address")
+    @Size(min = 10, max = 20)
     private String email;
     @NotNull
     @Size(min = 3, max = 20)

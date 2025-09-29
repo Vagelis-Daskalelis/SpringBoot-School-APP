@@ -1,12 +1,7 @@
 package com.vaggelis.SpringSchool.mapper;
 
-import com.vaggelis.SpringSchool.dto.SignUpRequest;
-import com.vaggelis.SpringSchool.dto.StudentReadDTO;
-import com.vaggelis.SpringSchool.dto.TeacherReadDTO;
-import com.vaggelis.SpringSchool.dto.UserReadDTO;
-import com.vaggelis.SpringSchool.models.Student;
-import com.vaggelis.SpringSchool.models.Teacher;
-import com.vaggelis.SpringSchool.models.User;
+import com.vaggelis.SpringSchool.dto.*;
+import com.vaggelis.SpringSchool.models.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 
@@ -44,19 +39,36 @@ private Mapper() {} // prevent instantiation
     }
 
 
-    //Maps User to UserReadDto
-    public static UserReadDTO mappingUserToReadDto(User user){
-        return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getRole(), user.getStatus());
-    }
+        //Maps User to UserReadDto
+        public static UserReadDTO mappingUserToReadDto(User user){
+            return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getRole(), user.getStatus());
+        }
 
-    //Maps Teacher to TeacherReadDto
-    public static TeacherReadDTO mappingTeacherToReadDto(Teacher teacher){
-        return new TeacherReadDTO(teacher.getId(), teacher.getFirstname(), teacher.getLastname(), Mapper.mappingUserToReadDto(teacher.getUser()));
-    }
+        //Maps Teacher to TeacherReadDto
+        public static TeacherReadDTO mappingTeacherToReadDto(Teacher teacher){
+            return new TeacherReadDTO(teacher.getId(), teacher.getFirstname(), teacher.getLastname(), Mapper.mappingUserToReadDto(teacher.getUser()));
+        }
 
     //Maps Student to StudentReadDto
     public static StudentReadDTO mappingStudentToReadDto(Student student){
         return new StudentReadDTO(student.getId(), student.getFirstname(), student.getLastname(), Mapper.mappingUserToReadDto(student.getUser()));
+    }
+
+    //Map to update a Student
+    public static Student extractStudentFromUpdateRequest(UpdateRequest request, User user){
+        return new Student(request.getId(), request.getFirstname(), request.getLastname(), user);
+    }
+
+    // Update only student fields
+    public static void updateStudentFromRequest(Student student, UpdateRequest request) {
+        student.setFirstname(request.getFirstname());
+        student.setLastname(request.getLastname());
+        // Don't touch student.getUser() at all
+    }
+
+    //Map to update a User
+    public static User extractUserFromUpdateRequest(Student student, UpdateRequest request, PasswordEncoder passwordEncoder){
+        return new User(student.getUser().getId(), request.getUsername(), passwordEncoder.encode(request.getPassword()), request.getEmail() , Role.STUDENT, Status.ACTIVE);
     }
 
 }

@@ -103,6 +103,13 @@ public class User implements UserDetails {
         this.status = status;
     }
 
+    public User(Long id, String username, String password, String email) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "User{" +
