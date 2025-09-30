@@ -1,9 +1,4 @@
-package com.vaggelis.SpringSchool.exception;
-
-import com.vaggelis.SpringSchool.models.Student;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+package com.vaggelis.SpringSchool.exception.student;
 
 public class StudentAlreadyExistsException extends Exception {
 

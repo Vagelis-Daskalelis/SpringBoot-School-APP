@@ -60,15 +60,34 @@ private Mapper() {} // prevent instantiation
     }
 
     // Update only student fields
-    public static void updateStudentFromRequest(Student student, UpdateRequest request) {
+    public static void patchStudentFromRequest(Student student, PatchRequest request) {
         student.setFirstname(request.getFirstname());
         student.setLastname(request.getLastname());
         // Don't touch student.getUser() at all
     }
 
+    public static void patchTeacherFromRequest(Teacher teacher, PatchRequest request) {
+        teacher.setFirstname(request.getFirstname());
+        teacher.setLastname(request.getLastname());
+        // Don't touch student.getUser() at all
+    }
+
     //Map to update a User
-    public static User extractUserFromUpdateRequest(Student student, UpdateRequest request, PasswordEncoder passwordEncoder){
+    public static User extractUserFromStudentUpdateRequest(Student student, UpdateRequest request, PasswordEncoder passwordEncoder){
         return new User(student.getUser().getId(), request.getUsername(), passwordEncoder.encode(request.getPassword()), request.getEmail() , Role.STUDENT, Status.ACTIVE);
+    }
+
+    public static Teacher extractTeacherFromUpdateRequest(UpdateRequest request, User user){
+        return new Teacher(request.getId(), request.getFirstname(), request.getLastname(), user);
+    }
+
+    public static User extractUserFromTeacherUpdateRequest(Teacher teacher, UpdateRequest request, PasswordEncoder passwordEncoder){
+        return new User(teacher.getUser().getId(), request.getUsername(), passwordEncoder.encode(request.getPassword()), request.getEmail(), Role.TEACHER, Status.ACTIVE);
+    }
+
+
+    public static Image mappingImageDtoToImage(ImageDTO dto){
+        return new Image(dto.getId(), dto.getFileName(), dto.getDownloadUrl());
     }
 
 }

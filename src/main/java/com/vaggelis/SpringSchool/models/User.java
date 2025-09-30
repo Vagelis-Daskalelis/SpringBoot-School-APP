@@ -2,6 +2,7 @@ package com.vaggelis.SpringSchool.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,11 +13,13 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-@Data
+
 @Entity
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Table(name = "users")
 public class User implements UserDetails {
     @Id
@@ -36,6 +39,10 @@ public class User implements UserDetails {
 //
 //    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
 //    private Student student;
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Image image;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -120,6 +127,10 @@ public class User implements UserDetails {
                 ", role=" + role +
                 ", status=" + status +
                 '}';
+    }
+
+    public void addImage(Image image){
+        this.image = image;
     }
 
     //    // --- Lifecycle callbacks ---

@@ -1,4 +1,4 @@
-package com.vaggelis.SpringSchool.exception;
+package com.vaggelis.SpringSchool.exception.teacher;
 
 public class TeacherNotFoundException extends Exception{
 

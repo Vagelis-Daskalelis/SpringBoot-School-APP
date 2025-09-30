@@ -1,43 +1,39 @@
 package com.vaggelis.SpringSchool.controller;
 
+import com.vaggelis.SpringSchool.dto.PatchRequest;
 import com.vaggelis.SpringSchool.dto.StudentReadDTO;
-import com.vaggelis.SpringSchool.exception.StudentNotFoundException;
+import com.vaggelis.SpringSchool.dto.UpdateRequest;
+import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
 import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.Student;
-import com.vaggelis.SpringSchool.models.User;
-import com.vaggelis.SpringSchool.service.ICRUDService;
+import com.vaggelis.SpringSchool.service.student.IStudentService;
 import com.vaggelis.SpringSchool.validator.SignUpValidator;
+import com.vaggelis.SpringSchool.validator.UpdateValidator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/student")
 @RequiredArgsConstructor
 public class StudentController {
 
-    private final ICRUDService crudService;
+    private final IStudentService studentService;
     private final SignUpValidator validator;
+    private final UpdateValidator updateValidator;
     private final PasswordEncoder passwordEncoder;
 
-    @GetMapping("/string")
-    public ResponseEntity<String> getMessage(){
-        System.out.println("It works");
-        return ResponseEntity.ok("It works");
-    }
 
     @GetMapping("/profile/{id}")
     public ResponseEntity<StudentReadDTO> seeYourProfile(@PathVariable Long id){
 
 
         try {
-            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(crudService.seeYourProfile(id));
+            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(studentService.seeYourProfile(id));
             return ResponseEntity.ok(readDTO);
         }catch (StudentNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -46,6 +42,22 @@ public class StudentController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
+    }
+
+    @PutMapping("/patch/student")
+    public ResponseEntity<StudentReadDTO> updateStudent(@Valid @RequestBody PatchRequest request, BindingResult bindingResult){
+        updateValidator.validate(request, bindingResult);
+        if (bindingResult.hasErrors()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Student student = studentService.patchYourStudent(request);
+            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
+            return new ResponseEntity<>(readDTO, HttpStatus.OK);
+        }catch (StudentNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
 
