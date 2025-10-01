@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -25,81 +26,114 @@ public class ImageServiceImpl implements IImageService{
 
     @Override
     public Image getImageById(Long id) throws ImageNotFoundException {
-        return null;
+        return imageRepository.findById(id)
+                .orElseThrow(() -> new ImageNotFoundException(Image.class, id));
     }
 
+
+    @Transactional
     @Override
-    public void deleteImageById(Long id) throws ImageNotFoundException {
+    public void deleteImageById() throws RuntimeException {
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Image image;
+
+        try {
+            User currentUser = userRepository.findByEmail(currentUserEmail)
+                    .orElseThrow(() -> {
+                        return new RuntimeException("User not found");
+                    });
+
+            image = currentUser.getImage();
+
+            if (image == null) throw new RuntimeException("Image not found");
+
+            currentUser.setImage(null);
+        } catch (RuntimeException e) {
+            throw e;
+        }
 
     }
-
-//    @Override
-//    public void addYourImage(MultipartFile file) {
-//        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-//
-//        try {
-//            User currentUser = userRepository.findByEmail(currentUserEmail)
-//                    .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//            Image image = new Image();
-//            image.setFileName(file.getOriginalFilename());
-//            image.setFileType(file.getContentType());
-//            image.setImage(file.getBytes());  // assuming image field is byte[]
-//
-//            Image savedImage = imageRepository.save(image);
-//
-//            // Add the managed entity directly to the user
-//            currentUser.addImage(savedImage);
-//
-//            // Save user so the relationship gets persisted
-//            userRepository.save(currentUser);
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException("Failed to save image: " + e.getMessage());
-//        }
-//    }
 
 
     @Override
     public void addYourImage(MultipartFile file) {
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        log.info("Adding image for user with email: {}", currentUserEmail);
 
         try {
             User currentUser = userRepository.findByEmail(currentUserEmail)
-                    .orElseThrow(() -> {
-                        log.error("User with email {} not found", currentUserEmail);
-                        return new RuntimeException("User not found");
-                    });
-
-            log.debug("Found user: {}", currentUser.getId());
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             Image image = new Image();
             image.setFileName(file.getOriginalFilename());
             image.setFileType(file.getContentType());
             image.setImage(file.getBytes());
 
-            log.debug("Prepared image entity. fileName={}, fileType={}, size={} bytes",
-                    image.getFileName(), image.getFileType(), file.getBytes().length);
-
             Image savedImage = imageRepository.save(image);
-            log.info("Image saved in DB with id={}", savedImage.getId());
-
             currentUser.addImage(savedImage);
-            log.debug("Image with id={} added to user id={}", savedImage.getId(), currentUser.getId());
-
             userRepository.save(currentUser);
-            log.info("User {} updated with new image {}", currentUser.getId(), savedImage.getId());
 
         } catch (IOException e) {
-            log.error("Failed to read file bytes: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to save image: " + e.getMessage());
         }
     }
 
 
-    @Override
-    public void updateImage(MultipartFile file, Long id) throws ImageNotFoundException {
+//    @Override
+//    public void addYourImage(MultipartFile file) {
+//        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+//        log.info("Starting image upload for user: {}", currentUserEmail);
+//
+//        try {
+//            User currentUser = userRepository.findByEmail(currentUserEmail)
+//                    .orElseThrow(() -> {
+//                        log.error("User with email {} not found", currentUserEmail);
+//                        return new RuntimeException("User not found");
+//                    });
+//            log.info("User found: id={}, email={}", currentUser.getId(), currentUser.getEmail());
+//
+//            Image image = new Image();
+//            image.setFileName(file.getOriginalFilename());
+//            image.setFileType(file.getContentType());
+//            image.setImage(file.getBytes());
+//            log.info("Image prepared: filename={}, type={}, size={} bytes",
+//                    image.getFileName(), image.getFileType(),
+//                    image.getImage() != null ? image.getImage().length : 0);
+//
+//            Image savedImage = imageRepository.save(image);
+//            log.info("Image saved: id={}, filename={}", savedImage.getId(), savedImage.getFileName());
+//
+//            currentUser.addImage(savedImage);
+//            log.info("Image linked to user: userId={}, imageId={}", currentUser.getId(), savedImage.getId());
+//
+//            userRepository.save(currentUser);
+//            log.info("User updated successfully with new image. userId={}", currentUser.getId());
+//
+//        } catch (IOException e) {
+//            log.error("Failed to read file bytes: {}", e.getMessage(), e);
+//            throw new RuntimeException("Failed to save image: " + e.getMessage());
+//        }
+//    }
 
+    @Override
+    public void updateImage(MultipartFile file) throws RuntimeException {
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Image image;
+
+        try {
+
+            User currentUser = userRepository.findByEmail(currentUserEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            image = currentUser.getImage();
+
+            if (image == null) throw new RuntimeException("Image not found");
+
+            image.setFileName(file.getOriginalFilename());
+            image.setFileType(file.getContentType());
+            image.setImage(file.getBytes());
+            imageRepository.save(image);
+        }catch (IOException e){
+            throw new RuntimeException(e.getMessage());
+        }
     }
 }

@@ -9,9 +9,16 @@ import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.service.student.IStudentService;
 import com.vaggelis.SpringSchool.validator.SignUpValidator;
 import com.vaggelis.SpringSchool.validator.UpdateValidator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -28,26 +35,84 @@ public class StudentController {
     private final PasswordEncoder passwordEncoder;
 
 
+    @Operation(
+            summary = "View student profile",
+            description = "Retrieves the profile details of a student by ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Student profile retrieved successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StudentReadDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Student not found",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Access forbidden",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @GetMapping("/profile/{id}")
-    public ResponseEntity<StudentReadDTO> seeYourProfile(@PathVariable Long id){
-
+    public ResponseEntity<StudentReadDTO> seeYourProfile(
+            @Parameter(
+                    description = "ID of the student to view",
+                    required = true
+            )
+            @PathVariable Long id) {
 
         try {
             StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(studentService.seeYourProfile(id));
             return ResponseEntity.ok(readDTO);
-        }catch (StudentNotFoundException e){
+        } catch (StudentNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-
     }
 
+
+    @Operation(
+            summary = "Patch student details",
+            description = "Updates specific fields of a student using a patch request"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Student patched successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StudentReadDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Student not found",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @PutMapping("/patch/student")
-    public ResponseEntity<StudentReadDTO> updateStudent(@Valid @RequestBody PatchRequest request, BindingResult bindingResult){
+    public ResponseEntity<StudentReadDTO> updateStudent(
+            @Parameter(
+                    description = "Partial student data to update",
+                    required = true
+            )
+            @Valid @RequestBody PatchRequest request,
+            BindingResult bindingResult) {
+
         updateValidator.validate(request, bindingResult);
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -55,7 +120,7 @@ public class StudentController {
             Student student = studentService.patchYourStudent(request);
             StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
             return new ResponseEntity<>(readDTO, HttpStatus.OK);
-        }catch (StudentNotFoundException e){
+        } catch (StudentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

@@ -12,9 +12,17 @@ import com.vaggelis.SpringSchool.service.student.IStudentService;
 import com.vaggelis.SpringSchool.service.teacher.ITeacherService;
 import com.vaggelis.SpringSchool.validator.SignUpValidator;
 import com.vaggelis.SpringSchool.validator.UpdateValidator;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -38,11 +46,37 @@ public class TeacherController {
     private final PasswordEncoder passwordEncoder;
 
 
-    //Creates a Student
+
+    @Operation(
+            summary = "Creates a student",
+            description = "Registers a new student with the provided sign-up information"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Student created successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StudentReadDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request or student already exists",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @PostMapping("/signUp/student")
-    public ResponseEntity<StudentReadDTO> signUpStudent(@Valid @RequestBody SignUpRequest request, BindingResult bindingResult){
+    public ResponseEntity<StudentReadDTO> signUpStudent(
+            @Parameter(
+                    description = "Sign-up information for the student",
+                    required = true
+            )
+            @Valid @RequestBody SignUpRequest request,
+            BindingResult bindingResult) {
+
         signUpValidator.validate(request, bindingResult);
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
@@ -53,82 +87,192 @@ public class TeacherController {
                     .buildAndExpand(readDTO.getId())
                     .toUri();
 
-            return  ResponseEntity.created(location).body(readDTO);
-        }catch (StudentAlreadyExistsException e) {
+            return ResponseEntity.created(location).body(readDTO);
+        } catch (StudentAlreadyExistsException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    //Finds a student by the id
+
+    @Operation(
+            summary = "Find a student by ID",
+            description = "Retrieves a student by their ID and returns the student details"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Student found successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StudentReadDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Student not found",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @GetMapping("/student/{id}")
-    public ResponseEntity<StudentReadDTO> findStudent(@PathVariable Long id){
+    public ResponseEntity<StudentReadDTO> findStudent(
+            @Parameter(
+                    description = "ID of the student to retrieve",
+                    required = true
+            )
+            @PathVariable Long id) {
+
         try {
             Student student = studentService.findStudentById(id);
             StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
             return new ResponseEntity<>(readDTO, HttpStatus.OK);
-        }catch (StudentNotFoundException e){
+        } catch (StudentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
 
-    //Finds a teacher by the id
+    @Operation(
+            summary = "Find a teacher by ID",
+            description = "Retrieves a teacher by their ID and returns the teacher details"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Teacher found successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = TeacherReadDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Teacher not found",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @GetMapping("/teacher/{id}")
-    public ResponseEntity<TeacherReadDTO> findTeacher(@PathVariable Long id){
+    public ResponseEntity<TeacherReadDTO> findTeacher(
+            @Parameter(
+                    description = "ID of the teacher to retrieve",
+                    required = true
+            )
+            @PathVariable Long id) {
+
         try {
             Teacher teacher = teacherService.findTeacherById(id);
             TeacherReadDTO readDTO = Mapper.mappingTeacherToReadDto(teacher);
             return new ResponseEntity<>(readDTO, HttpStatus.OK);
-        }catch (TeacherNotFoundException e){
+        } catch (TeacherNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
 
-    //Finds all teachers
+
+    @Operation(
+            summary = "Get all teachers",
+            description = "Retrieves a list of all teachers and returns their details"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of teachers retrieved successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = TeacherReadDTO.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Failed to retrieve teachers",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @GetMapping("/teacher/all")
-    public ResponseEntity<List<TeacherReadDTO>> findAllTeachers(){
-        List<Teacher> teachers;
-
+    public ResponseEntity<List<TeacherReadDTO>> findAllTeachers() {
         try {
-            teachers = teacherService.findAllTeachers();
+            List<Teacher> teachers = teacherService.findAllTeachers();
             List<TeacherReadDTO> readDTOS = new ArrayList<>();
-
-            for (Teacher teacher : teachers){
+            for (Teacher teacher : teachers) {
                 readDTOS.add(Mapper.mappingTeacherToReadDto(teacher));
             }
-
             return new ResponseEntity<>(readDTOS, HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
 
-    //Finds all students
+
+    @Operation(
+            summary = "Get all students",
+            description = "Retrieves a list of all students and returns their details"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "List of students retrieved successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(schema = @Schema(implementation = StudentReadDTO.class))
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Failed to retrieve students",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @GetMapping("/student/all")
-    public ResponseEntity<List<StudentReadDTO>> findAllStudents(){
-        List<Student> students;
-
+    public ResponseEntity<List<StudentReadDTO>> findAllStudents() {
         try {
-            students = studentService.findAllStudents();
+            List<Student> students = studentService.findAllStudents();
             List<StudentReadDTO> readDTOS = new ArrayList<>();
-
-            for (Student student : students){
+            for (Student student : students) {
                 readDTOS.add(Mapper.mappingStudentToReadDto(student));
             }
-
             return new ResponseEntity<>(readDTOS, HttpStatus.OK);
-        }catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    //Update a Student
+
+    @Operation(
+            summary = "Update student and user details",
+            description = "Updates the information of a student and their associated user account"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Student updated successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = StudentReadDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Student not found",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @PutMapping("/update/student")
-    public ResponseEntity<StudentReadDTO> updateStudentAndUser(@Valid @RequestBody UpdateRequest request, BindingResult bindingResult){
+    public ResponseEntity<StudentReadDTO> updateStudentAndUser(
+            @Parameter(
+                    description = "Updated student information",
+                    required = true
+            )
+            @Valid @RequestBody UpdateRequest request,
+            BindingResult bindingResult) {
+
         updateValidator.validate(request, bindingResult);
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -136,15 +280,47 @@ public class TeacherController {
             Student student = studentService.updateStudentAndUser(request);
             StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
             return new ResponseEntity<>(readDTO, HttpStatus.OK);
-        }catch (StudentNotFoundException e){
+        } catch (StudentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
+
+    @Operation(
+            summary = "Patch teacher details",
+            description = "Updates specific fields of a teacher using a patch request"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Teacher patched successfully",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = TeacherReadDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid input data",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Teacher not found",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
+            )
+    })
     @PutMapping("/patch/teacher")
-    public ResponseEntity<TeacherReadDTO> updateStudent(@Valid @RequestBody PatchRequest request, BindingResult bindingResult){
+    public ResponseEntity<TeacherReadDTO> updateStudent(
+            @Parameter(
+                    description = "Partial teacher data to update",
+                    required = true
+            )
+            @Valid @RequestBody PatchRequest request,
+            BindingResult bindingResult) {
+
         updateValidator.validate(request, bindingResult);
-        if (bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
@@ -152,7 +328,7 @@ public class TeacherController {
             Teacher teacher = teacherService.patchYourTeacher(request);
             TeacherReadDTO readDTO = Mapper.mappingTeacherToReadDto(teacher);
             return new ResponseEntity<>(readDTO, HttpStatus.OK);
-        }catch (TeacherNotFoundException e){
+        } catch (TeacherNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
