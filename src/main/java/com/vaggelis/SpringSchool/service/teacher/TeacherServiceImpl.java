@@ -7,6 +7,7 @@ import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
 import com.vaggelis.SpringSchool.exception.teacher.TeacherAlreadyExistsException;
 import com.vaggelis.SpringSchool.exception.teacher.TeacherNotFoundException;
 import com.vaggelis.SpringSchool.mapper.Mapper;
+import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.models.Teacher;
 import com.vaggelis.SpringSchool.models.User;
 import com.vaggelis.SpringSchool.repository.ITeacherRepository;
@@ -93,23 +94,24 @@ public class TeacherServiceImpl implements ITeacherService{
 
     @Override
     public Teacher updateTeacherAndUser(UpdateRequest request)throws TeacherNotFoundException {
-        User updatedUser;
+        User user;
         Teacher teacher;
-        Teacher updatedTeacher;
 
         try {
             teacher = teacherRepository.findTeacherById(request.getId());
-            if (teacher == null) throw new TeacherNotFoundException(Teacher.class, request.getId());
+            if (teacher == null) throw new TeacherNotFoundException(Student.class, request.getId());
 
-            updatedUser = Mapper.extractUserFromTeacherUpdateRequest(teacher, request, passwordEncoder);
-            updatedTeacher = Mapper.extractTeacherFromUpdateRequest(request, updatedUser);
+            user = teacher.getUser();
+
+            Mapper.updateUserFromRequest(user, request, passwordEncoder);
+            Mapper.updateTeacherFromRequest(teacher, request);
 
 
-            teacherRepository.save(updatedTeacher);
+            teacherRepository.save(teacher);
         }catch (TeacherNotFoundException e){
             throw e;
         }
-        return updatedTeacher;
+        return teacher;
     }
 
     @Override
@@ -130,14 +132,11 @@ public class TeacherServiceImpl implements ITeacherService{
 
             // Use the mapper to update only student fields
             Mapper.patchTeacherFromRequest(targetTeacher, request);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
         } catch (TeacherNotFoundException e) {
-            throw new RuntimeException(e);
+            throw  e;
         }
-
         return teacherRepository.save(targetTeacher);
-    }
+        }
 }
 
 

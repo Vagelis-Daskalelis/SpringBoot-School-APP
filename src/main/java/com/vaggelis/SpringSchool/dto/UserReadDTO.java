@@ -1,5 +1,6 @@
 package com.vaggelis.SpringSchool.dto;
 
+import com.vaggelis.SpringSchool.models.Image;
 import com.vaggelis.SpringSchool.models.Role;
 import com.vaggelis.SpringSchool.models.Status;
 import jakarta.validation.constraints.NotNull;
@@ -21,4 +22,5 @@ public class UserReadDTO {
     private String password;
     private Role role;
     private Status status;
+    private ImageReadDTO imageReadDTO;
 }

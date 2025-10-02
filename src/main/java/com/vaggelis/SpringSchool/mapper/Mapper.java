@@ -39,10 +39,32 @@ private Mapper() {} // prevent instantiation
     }
 
 
-        //Maps User to UserReadDto
-        public static UserReadDTO mappingUserToReadDto(User user){
-            return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getRole(), user.getStatus());
+//        //Maps User to UserReadDto
+//        public static UserReadDTO mappingUserToReadDto(User user){
+//            return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getRole(), user.getStatus(), user.getImage());
+//        }
+
+    public static UserReadDTO mappingUserToReadDto(User user) {
+        UserReadDTO dto = new UserReadDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole());
+        dto.setStatus(user.getStatus());
+
+        if (user.getImage() != null) {
+            Image img = user.getImage();
+            ImageReadDTO imgDto = new ImageReadDTO(
+                    img.getId(),
+                    img.getFileName(),
+                    img.getFileType(),
+                    "/images/download/" + img.getId() // build URL here
+            );
+            dto.setImageReadDTO(imgDto);
         }
+
+        return dto;
+    }
 
         //Maps Teacher to TeacherReadDto
         public static TeacherReadDTO mappingTeacherToReadDto(Teacher teacher){
@@ -72,21 +94,23 @@ private Mapper() {} // prevent instantiation
         // Don't touch student.getUser() at all
     }
 
-    //Map to update a User
-    public static User extractUserFromStudentUpdateRequest(Student student, UpdateRequest request, PasswordEncoder passwordEncoder){
-        return new User(student.getUser().getId(), request.getUsername(), passwordEncoder.encode(request.getPassword()), request.getEmail() , Role.STUDENT, Status.ACTIVE);
+    public static void updateStudentFromRequest(Student student, UpdateRequest request){
+        student.setFirstname(request.getFirstname());
+        student.setLastname(request.getLastname());
     }
 
-    public static Teacher extractTeacherFromUpdateRequest(UpdateRequest request, User user){
-        return new Teacher(request.getId(), request.getFirstname(), request.getLastname(), user);
+    public static void updateTeacherFromRequest(Teacher teacher, UpdateRequest request){
+        teacher.setFirstname(request.getFirstname());
+        teacher.setLastname(request.getLastname());
     }
 
-    public static User extractUserFromTeacherUpdateRequest(Teacher teacher, UpdateRequest request, PasswordEncoder passwordEncoder){
-        return new User(teacher.getUser().getId(), request.getUsername(), passwordEncoder.encode(request.getPassword()), request.getEmail(), Role.TEACHER, Status.ACTIVE);
+    public static void updateUserFromRequest(User user, UpdateRequest request, PasswordEncoder passwordEncoder){
+        user.setUsername(request.getUsername());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail());
     }
 
-
-    public static Image mappingImageDtoToImage(ImageDTO dto){
+    public static Image mappingImageDtoToImage(ImageReadDTO dto){
         return new Image(dto.getId(), dto.getFileName(), dto.getDownloadUrl());
     }
 

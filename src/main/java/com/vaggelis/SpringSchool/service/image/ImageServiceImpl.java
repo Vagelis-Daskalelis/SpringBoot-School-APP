@@ -1,8 +1,6 @@
 package com.vaggelis.SpringSchool.service.image;
 
-import com.vaggelis.SpringSchool.dto.ImageDTO;
 import com.vaggelis.SpringSchool.exception.image.ImageNotFoundException;
-import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.Image;
 import com.vaggelis.SpringSchool.models.User;
 import com.vaggelis.SpringSchool.repository.IImageRepository;

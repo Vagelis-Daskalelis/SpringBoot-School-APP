@@ -95,17 +95,24 @@ public class StudentServiceImpl implements IStudentService{
     public Student seeYourProfile(Long targetId) throws StudentNotFoundException {
         // Get the logged-in user's email from the JWT authentication context
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Student targetStudent = null;
 
-        // Find the logged-in user
-        User currentUser = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            // Find the logged-in user
+            User currentUser = userRepository.findByEmail(currentUserEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Make sure the logged-in user is actually a student
-        Student targetStudent = studentRepository.findById(targetId)
-                .orElseThrow(() -> new StudentNotFoundException(Student.class, targetId));
+            // Make sure the logged-in user is actually a student
+            targetStudent = studentRepository.findById(targetId)
+                    .orElseThrow(() -> new StudentNotFoundException(Student.class, targetId));
 
-        if (!targetStudent.getUser().getId().equals(currentUser.getId())) {
-            throw new SecurityException("You are not authorized to see this profile");
+            if (!targetStudent.getUser().getId().equals(currentUser.getId())) {
+                throw new SecurityException("You are not authorized to see this profile");
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        } catch (StudentNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
         return targetStudent;
@@ -129,34 +136,32 @@ public class StudentServiceImpl implements IStudentService{
 
             // Use the mapper to update only student fields
             Mapper.patchStudentFromRequest(targetStudent, request);
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
         } catch (StudentNotFoundException e) {
-            throw new RuntimeException(e);
+            throw  e;
         }
-
         return studentRepository.save(targetStudent);
     }
 
     @Override
     public Student updateStudentAndUser(UpdateRequest request) throws StudentNotFoundException {
-        User updatedUser;
+        User user;
         Student student;
-        Student updatedStudent;
 
         try {
             student = studentRepository.findStudentById(request.getId());
             if (student == null) throw new StudentNotFoundException(Student.class, request.getId());
 
-            updatedUser = Mapper.extractUserFromStudentUpdateRequest(student, request, passwordEncoder);
-            updatedStudent = Mapper.extractStudentFromUpdateRequest(request, updatedUser);
+            user = student.getUser();
+
+            Mapper.updateUserFromRequest(user, request, passwordEncoder);
+            Mapper.updateStudentFromRequest(student, request);
 
 
-            studentRepository.save(updatedStudent);
+            studentRepository.save(student);
         }catch (StudentNotFoundException e){
             throw e;
         }
-        return updatedStudent;
+        return student;
     }
 
 

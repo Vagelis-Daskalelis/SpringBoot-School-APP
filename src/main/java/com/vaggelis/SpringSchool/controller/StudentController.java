@@ -7,6 +7,7 @@ import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
 import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.service.student.IStudentService;
+import com.vaggelis.SpringSchool.validator.PatchValidator;
 import com.vaggelis.SpringSchool.validator.SignUpValidator;
 import com.vaggelis.SpringSchool.validator.UpdateValidator;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,7 @@ public class StudentController {
     private final SignUpValidator validator;
     private final UpdateValidator updateValidator;
     private final PasswordEncoder passwordEncoder;
+    private final PatchValidator patchValidator;
 
 
     @Operation(
@@ -111,7 +113,7 @@ public class StudentController {
             @Valid @RequestBody PatchRequest request,
             BindingResult bindingResult) {
 
-        updateValidator.validate(request, bindingResult);
+        patchValidator.validate(request, bindingResult);
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
