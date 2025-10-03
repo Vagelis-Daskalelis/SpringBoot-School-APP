@@ -37,6 +37,9 @@ public class StudentController {
     private final PatchValidator patchValidator;
 
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "View student profile",
             description = "Retrieves the profile details of a student by ID"
@@ -68,6 +71,9 @@ public class StudentController {
                     required = true
             )
             @PathVariable Long id) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         try {
             StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(studentService.seeYourProfile(id));
@@ -77,9 +83,14 @@ public class StudentController {
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Patch student details",
             description = "Updates specific fields of a student using a patch request"
@@ -112,6 +123,9 @@ public class StudentController {
             )
             @Valid @RequestBody PatchRequest request,
             BindingResult bindingResult) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         patchValidator.validate(request, bindingResult);
         if (bindingResult.hasErrors()) {
@@ -125,6 +139,9 @@ public class StudentController {
         } catch (StudentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 

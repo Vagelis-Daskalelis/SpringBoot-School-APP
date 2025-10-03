@@ -17,4 +17,5 @@ public interface ICRUDService {
     void logout(String email);
     User findUserByEmail(String email) throws UserNotFoundException;
     List<User> findAllUsers();
+    User changeStatus(Long id) throws UserNotFoundException;
 }

@@ -26,8 +26,9 @@ public class ImageController {
 
     private final IImageService imageService;
 
-
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Upload an image",
             description = "Uploads an image file to the server"
@@ -44,12 +45,17 @@ public class ImageController {
                     content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
             )
     })
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> saveImages(
             @Parameter(
                     description = "Image file to upload",
                     required = true
             )
             @RequestParam("file") MultipartFile file) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
         try {
             imageService.addYourImage(file);
             return ResponseEntity.ok("Image added");
@@ -57,9 +63,14 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Upload failed!");
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(summary = "Download image by ID")
     @ApiResponses(value = {
             @ApiResponse(
@@ -74,6 +85,10 @@ public class ImageController {
     })
     @GetMapping(value = "/download/{imageId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> downloadImage(@PathVariable Long imageId) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
         try {
             Image image = imageService.getImageById(imageId);
             ByteArrayResource resource = new ByteArrayResource(image.getImage());
@@ -85,9 +100,14 @@ public class ImageController {
         } catch (ImageNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-    @DeleteMapping("/delete")
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Delete current user's image",
             description = "Deletes the image associated with the currently authenticated user"
@@ -109,7 +129,12 @@ public class ImageController {
                     content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
             )
     })
+    @DeleteMapping("/delete")
     public ResponseEntity<String> deleteImage() {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
         try {
             imageService.deleteImageById();
             return ResponseEntity.ok("Delete success!");
@@ -118,10 +143,15 @@ public class ImageController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 
-    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Update current user's image",
             description = "Replaces the image associated with the currently authenticated user"
@@ -143,12 +173,17 @@ public class ImageController {
                     content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
             )
     })
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateImage(
             @Parameter(
                     description = "New image file to update",
                     required = true
             )
             @RequestParam("file") MultipartFile file) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
         try {
             imageService.updateImage(file);
             return ResponseEntity.ok("Update success!");
@@ -157,6 +192,9 @@ public class ImageController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 }

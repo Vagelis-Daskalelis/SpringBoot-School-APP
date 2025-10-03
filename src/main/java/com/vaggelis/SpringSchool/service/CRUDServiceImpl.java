@@ -115,5 +115,25 @@ public class CRUDServiceImpl implements ICRUDService {
     }
 
 
+    @Override
+    public User changeStatus(Long id) throws UserNotFoundException {
+        User user;
+
+        try {
+            user = userRepository.findById(id)
+                    .orElseThrow(() -> new UserNotFoundException(User.class, id));
+
+            if (user.getStatus().equals(Status.ACTIVE)){
+                user.setStatus(Status.BANNED);
+            }else {
+                user.setStatus(Status.ACTIVE);
+            }
+
+            userRepository.save(user);
+        }catch (UserNotFoundException e){
+            throw e;
+        }
+        return user;
+    }
 }
 

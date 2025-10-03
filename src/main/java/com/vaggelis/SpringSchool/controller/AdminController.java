@@ -47,8 +47,9 @@ public class AdminController {
     private final UpdateValidator updateValidator;
     private final PasswordEncoder passwordEncoder;
 
-
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Creates a teacher",
             description = "Registers a new teacher with the provided sign-up information"
@@ -76,6 +77,9 @@ public class AdminController {
             )
             @Valid @RequestBody SignUpRequest request,
             BindingResult bindingResult) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         validator.validate(request, bindingResult);
         if (bindingResult.hasErrors()){
@@ -93,9 +97,14 @@ public class AdminController {
         } catch (TeacherAlreadyExistsException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Find a user by email",
             description = "Retrieves a user by their email address and returns user details"
@@ -122,6 +131,10 @@ public class AdminController {
                     required = true
             )
             @PathVariable String email) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
         try {
             User user = crudService.findUserByEmail(email);
             UserReadDTO readDTO = Mapper.mappingUserToReadDto(user);
@@ -129,9 +142,15 @@ public class AdminController {
         } catch (UserNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Get all users",
             description = "Retrieves a list of all users and returns their details"
@@ -153,6 +172,10 @@ public class AdminController {
     })
     @GetMapping("/user/all")
     public ResponseEntity<List<UserReadDTO>> findAllUsers() {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
         try {
             List<User> users = crudService.findAllUsers();
             List<UserReadDTO> readDTOS = new ArrayList<>();
@@ -163,8 +186,14 @@ public class AdminController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Delete a teacher by ID",
             description = "Deletes a teacher from the system by their ID and returns the deleted teacher details"
@@ -191,6 +220,9 @@ public class AdminController {
                     required = true
             )
             @PathVariable Long id) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         try {
             Teacher teacher = teacherService.deleteTeacher(id);
@@ -198,8 +230,14 @@ public class AdminController {
         } catch (TeacherNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Delete a student by ID",
             description = "Deletes a student from the system by their ID and returns the deleted student details"
@@ -226,6 +264,9 @@ public class AdminController {
                     required = true
             )
             @PathVariable Long id) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         try {
             Student student = studentService.deleteStudent(id);
@@ -233,9 +274,14 @@ public class AdminController {
         } catch (StudentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Update teacher and user details",
             description = "Updates the information of a teacher and their associated user account"
@@ -268,6 +314,9 @@ public class AdminController {
             )
             @Valid @RequestBody UpdateRequest request,
             BindingResult bindingResult) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         updateValidator.validate(request, bindingResult);
         if (bindingResult.hasErrors()){
@@ -281,6 +330,47 @@ public class AdminController {
         } catch (TeacherNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
+    }
+
+    // ===========================
+    // Swagger Documentation
+    // ===========================
+    @Operation(
+            summary = "Change user status",
+            description = "Toggles a user's status between ACTIVE and BANNED"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "User status changed successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserReadDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content
+            )
+    })
+    @PutMapping("status/{id}")
+    public ResponseEntity<UserReadDTO> changeStatus(@PathVariable Long id){
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
+        try {
+            User user = crudService.changeStatus(id);
+            UserReadDTO readDTO = Mapper.mappingUserToReadDto(user);
+            return new ResponseEntity<>(readDTO, HttpStatus.OK);
+        }catch (UserNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 }

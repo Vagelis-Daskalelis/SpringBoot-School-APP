@@ -114,4 +114,12 @@ private Mapper() {} // prevent instantiation
         return new Image(dto.getId(), dto.getFileName(), dto.getDownloadUrl());
     }
 
+    public static Speciality mapSpecialityToInsertDto(SpecialityInsertDTO dto){
+        return new Speciality(null, dto.getName());
+    }
+
+    public static SpecialityReadDTO mapReadDtoSpeciality(Speciality speciality){
+        return new SpecialityReadDTO(speciality.getId(), speciality.getName());
+    }
+
 }

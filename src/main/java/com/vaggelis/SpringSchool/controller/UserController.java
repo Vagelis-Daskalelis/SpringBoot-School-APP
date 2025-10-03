@@ -32,7 +32,9 @@ public class UserController {
     private final IPasswordResetService passwordResetService;
     private final IImageService imageService;
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Sign in a user",
             description = "Authenticates a user and returns a JWT token"
@@ -59,11 +61,19 @@ public class UserController {
                     required = true
             )
             @RequestBody SignInRequest request) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         return ResponseEntity.ok(crudService.SignIn(request));
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Request password reset",
             description = "Sends a password reset link to the specified email address"
@@ -87,12 +97,20 @@ public class UserController {
                     required = true
             )
             @RequestParam String email) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         passwordResetService.createPasswordResetToken(email);
         return ResponseEntity.ok("Reset link sent");
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Reset password",
             description = "Resets the user's password using a valid password reset token"
@@ -121,12 +139,20 @@ public class UserController {
                     required = true
             )
             @RequestBody ResetPasswordRequest req) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         passwordResetService.resetPassword(req.getToken(), req.getNewPassword());
         return ResponseEntity.ok("Password updated");
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Logout user",
             description = "Logs out the currently authenticated user"
@@ -150,6 +176,9 @@ public class UserController {
                     required = false
             )
             Authentication authentication) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
@@ -159,6 +188,9 @@ public class UserController {
         crudService.logout(email);
 
         return ResponseEntity.ok("User logged out successfully");
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 //    @PostMapping("/upload")

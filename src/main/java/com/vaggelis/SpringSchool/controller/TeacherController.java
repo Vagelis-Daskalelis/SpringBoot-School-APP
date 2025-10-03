@@ -47,6 +47,9 @@ public class TeacherController {
 
 
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Creates a student",
             description = "Registers a new student with the provided sign-up information"
@@ -74,6 +77,9 @@ public class TeacherController {
             )
             @Valid @RequestBody SignUpRequest request,
             BindingResult bindingResult) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         signUpValidator.validate(request, bindingResult);
         if (bindingResult.hasErrors()) {
@@ -91,9 +97,15 @@ public class TeacherController {
         } catch (StudentAlreadyExistsException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Find a student by ID",
             description = "Retrieves a student by their ID and returns the student details"
@@ -120,6 +132,9 @@ public class TeacherController {
                     required = true
             )
             @PathVariable Long id) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         try {
             Student student = studentService.findStudentById(id);
@@ -128,9 +143,15 @@ public class TeacherController {
         } catch (StudentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Find a teacher by ID",
             description = "Retrieves a teacher by their ID and returns the teacher details"
@@ -157,6 +178,9 @@ public class TeacherController {
                     required = true
             )
             @PathVariable Long id) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         try {
             Teacher teacher = teacherService.findTeacherById(id);
@@ -165,10 +189,14 @@ public class TeacherController {
         } catch (TeacherNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Get all teachers",
             description = "Retrieves a list of all teachers and returns their details"
@@ -190,6 +218,10 @@ public class TeacherController {
     })
     @GetMapping("/teacher/all")
     public ResponseEntity<List<TeacherReadDTO>> findAllTeachers() {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
         try {
             List<Teacher> teachers = teacherService.findAllTeachers();
             List<TeacherReadDTO> readDTOS = new ArrayList<>();
@@ -200,10 +232,14 @@ public class TeacherController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Get all students",
             description = "Retrieves a list of all students and returns their details"
@@ -225,6 +261,10 @@ public class TeacherController {
     })
     @GetMapping("/student/all")
     public ResponseEntity<List<StudentReadDTO>> findAllStudents() {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
         try {
             List<Student> students = studentService.findAllStudents();
             List<StudentReadDTO> readDTOS = new ArrayList<>();
@@ -235,9 +275,15 @@ public class TeacherController {
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Update student and user details",
             description = "Updates the information of a student and their associated user account"
@@ -270,6 +316,9 @@ public class TeacherController {
             )
             @Valid @RequestBody UpdateRequest request,
             BindingResult bindingResult) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         updateValidator.validate(request, bindingResult);
         if (bindingResult.hasErrors()) {
@@ -283,9 +332,14 @@ public class TeacherController {
         } catch (StudentNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
-
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
             summary = "Patch teacher details",
             description = "Updates specific fields of a teacher using a patch request"
@@ -318,6 +372,9 @@ public class TeacherController {
             )
             @Valid @RequestBody PatchRequest request,
             BindingResult bindingResult) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
 
         updateValidator.validate(request, bindingResult);
         if (bindingResult.hasErrors()) {
@@ -331,6 +388,9 @@ public class TeacherController {
         } catch (TeacherNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
 }

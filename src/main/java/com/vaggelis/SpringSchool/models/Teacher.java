@@ -27,6 +27,20 @@ public class Teacher {
         this.user = user;
     }
 
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "speciality_id", referencedColumnName = "id")
+    private Speciality speciality;
+
+    public void addSpeciality(Speciality speciality){
+        this.speciality = speciality;
+        speciality.addTeacher(this);
+    }
+
+    public void removeSpeciality(Speciality speciality){
+        this.speciality = null;
+        speciality.removeTeacher(this);
+    }
+
     public Teacher(Long id, String firstname, String lastname) {
         this.id = id;
         this.firstname = firstname;
