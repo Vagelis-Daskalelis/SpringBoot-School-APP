@@ -1,7 +1,7 @@
 package com.vaggelis.SpringSchool.config;
 
-import com.vaggelis.SpringSchool.service.IJWTService;
-import com.vaggelis.SpringSchool.service.IUserService;
+import com.vaggelis.SpringSchool.service.jwt.IJWTService;
+import com.vaggelis.SpringSchool.service.user.IUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

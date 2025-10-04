@@ -4,8 +4,8 @@ package com.vaggelis.SpringSchool.service.pdf;
 //import com.lowagie.text.pdf.PdfPCell;
 //import com.lowagie.text.pdf.PdfPTable;
 //import com.lowagie.text.pdf.PdfWriter;
-//import com.vaggelis.SpringSchool.dto.ImageReadDTO;
-//import com.vaggelis.SpringSchool.dto.StudentReadDTO;
+//import com.vaggelis.SpringSchool.dto.image.ImageReadDTO;
+//import com.vaggelis.SpringSchool.dto.student.StudentReadDTO;
 //import com.vaggelis.SpringSchool.mapper.Mapper;
 //import com.vaggelis.SpringSchool.models.Student;
 //import com.vaggelis.SpringSchool.repository.IStudentRepository;
@@ -28,10 +28,9 @@ import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import com.lowagie.text.pdf.PdfPCell;
-import com.vaggelis.SpringSchool.dto.ImageReadDTO;
-import com.vaggelis.SpringSchool.dto.StudentReadDTO;
-import com.vaggelis.SpringSchool.dto.TeacherReadDTO;
+import com.vaggelis.SpringSchool.dto.image.ImageReadDTO;
+import com.vaggelis.SpringSchool.dto.student.StudentReadDTO;
+import com.vaggelis.SpringSchool.dto.teacher.TeacherReadDTO;
 import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.models.Teacher;
@@ -39,14 +38,10 @@ import com.vaggelis.SpringSchool.repository.IStudentRepository;
 import com.vaggelis.SpringSchool.repository.ITeacherRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -126,11 +121,11 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
             table.addCell(String.valueOf(student.getId()));
             table.addCell(student.getFirstname());
             table.addCell(student.getLastname());
-            table.addCell(student.getUserReadDTO().getUsername());
-            table.addCell(student.getUserReadDTO().getEmail());
-            table.addCell(student.getUserReadDTO().getStatus().toString());
+            table.addCell(student.getUser().getUsername());
+            table.addCell(student.getUser().getEmail());
+            table.addCell(student.getUser().getStatus().toString());
 
-            ImageReadDTO img = student.getUserReadDTO().getImageReadDTO();
+            ImageReadDTO img = student.getUser().getImage();
             if (img != null && img.getDownloadUrl() != null) {
                 // Add download URL as text (optional: you could fetch bytes and embed image if needed)
                 table.addCell(img.getDownloadUrl());
@@ -144,6 +139,13 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
     }
 
 
+    /**Creates a PDF with all the students
+     *
+     * @param response
+     * @throws IOException
+     * @throws DocumentException
+     * @throws com.itextpdf.text.BadElementException
+     */
     @Override
     public void allStudentsWithImage(HttpServletResponse response) throws IOException, DocumentException, com.itextpdf.text.BadElementException {
         response.setContentType("application/pdf");
@@ -188,9 +190,9 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
                 table.addCell(String.valueOf(dto.getId()));
                 table.addCell(dto.getFirstname());
                 table.addCell(dto.getLastname());
-                table.addCell(dto.getUserReadDTO().getUsername());
-                table.addCell(dto.getUserReadDTO().getEmail());
-                table.addCell(dto.getUserReadDTO().getStatus().toString());
+                table.addCell(dto.getUser().getUsername());
+                table.addCell(dto.getUser().getEmail());
+                table.addCell(dto.getUser().getStatus().toString());
 
                 // Image cell
                 if (student.getUser().getImage() != null && student.getUser().getImage().getImage() != null) {
@@ -215,6 +217,13 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
         document.close();
     }
 
+    /**Creates a PDF with all the teachers
+     *
+     * @param response
+     * @throws IOException
+     * @throws DocumentException
+     * @throws com.itextpdf.text.BadElementException
+     */
     @Override
     public void allTeachersWithImage(HttpServletResponse response) throws IOException, DocumentException, com.itextpdf.text.BadElementException {
         response.setContentType("application/pdf");
@@ -259,9 +268,9 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
                 table.addCell(String.valueOf(dto.getId()));
                 table.addCell(dto.getFirstname());
                 table.addCell(dto.getLastname());
-                table.addCell(dto.getUserReadDTO().getUsername());
-                table.addCell(dto.getUserReadDTO().getEmail());
-                table.addCell(dto.getUserReadDTO().getStatus().toString());
+                table.addCell(dto.getUser().getUsername());
+                table.addCell(dto.getUser().getEmail());
+                table.addCell(dto.getUser().getStatus().toString());
 
                 // Image cell
                 if (teacher.getUser().getImage() != null && teacher.getUser().getImage().getImage() != null) {

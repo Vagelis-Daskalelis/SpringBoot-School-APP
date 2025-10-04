@@ -1,17 +1,19 @@
 package com.vaggelis.SpringSchool.service.teacher;
 
-import com.vaggelis.SpringSchool.dto.PatchRequest;
-import com.vaggelis.SpringSchool.dto.SignUpRequest;
-import com.vaggelis.SpringSchool.dto.UpdateRequest;
-import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
+import com.vaggelis.SpringSchool.dto.request.PatchRequest;
+import com.vaggelis.SpringSchool.dto.request.SignUpRequest;
+import com.vaggelis.SpringSchool.dto.request.UpdateRequest;
 import com.vaggelis.SpringSchool.exception.teacher.TeacherAlreadyExistsException;
 import com.vaggelis.SpringSchool.exception.teacher.TeacherNotFoundException;
 import com.vaggelis.SpringSchool.mapper.Mapper;
+import com.vaggelis.SpringSchool.models.Speciality;
 import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.models.Teacher;
 import com.vaggelis.SpringSchool.models.User;
+import com.vaggelis.SpringSchool.repository.ISpecialityRepository;
 import com.vaggelis.SpringSchool.repository.ITeacherRepository;
 import com.vaggelis.SpringSchool.repository.IUserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +30,7 @@ public class TeacherServiceImpl implements ITeacherService{
 
     private final IUserRepository userRepository;
     private final ITeacherRepository teacherRepository;
+    private final ISpecialityRepository specialityRepository;
     private final PasswordEncoder passwordEncoder;
 
     //Creates a Teacher
@@ -137,6 +140,47 @@ public class TeacherServiceImpl implements ITeacherService{
         }
         return teacherRepository.save(targetTeacher);
         }
+
+
+    @Override
+    public Teacher addSpecialityToTeacher(Long teacherId, Long specialityId) throws EntityNotFoundException {
+        Teacher teacher;
+        Speciality speciality;
+
+        try {
+            teacher = teacherRepository.findById(teacherId)
+                    .orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
+
+            speciality = specialityRepository.findById(specialityId)
+                    .orElseThrow(() -> new EntityNotFoundException("Speciality not found"));
+
+            //if (teacher.getSpeciality() != null)
+
+            teacher.addSpeciality(speciality);
+            teacherRepository.save(teacher);
+        }catch (EntityNotFoundException e){
+            throw e;
+        }
+        return teacher;
+    }
+
+    @Override
+    public Teacher removeSpecialityFromTeacher(Long id) throws TeacherNotFoundException {
+        Teacher teacher;
+        Speciality speciality;
+
+        try {
+            teacher = teacherRepository.findById(id)
+                    .orElseThrow(() -> new TeacherNotFoundException(Teacher.class, id));
+            speciality = teacher.getSpeciality();
+
+            teacher.removeSpeciality(speciality);
+            teacherRepository.save(teacher);
+        }catch (TeacherNotFoundException e){
+            throw e;
+        }
+        return teacher;
+    }
 }
 
 

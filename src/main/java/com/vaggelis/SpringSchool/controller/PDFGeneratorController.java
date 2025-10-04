@@ -2,6 +2,9 @@ package com.vaggelis.SpringSchool.controller;
 
 import com.itextpdf.text.BadElementException;
 import com.vaggelis.SpringSchool.service.pdf.IPDFGeneratorService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +50,15 @@ public class PDFGeneratorController {
         this.pdfGeneratorService.allStudents(response);
     }
 
+    @Operation(
+            summary = "Generate PDF of students with images",
+            description = "Creates a PDF containing all students, including their images, " +
+                    "and sends it as a file download in the HTTP response."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "PDF successfully generated and sent"),
+            @ApiResponse(responseCode = "500", description = "Error occurred while generating the PDF")
+    })
     @GetMapping("/students/images")
     public void StudentsImagePDF(HttpServletResponse response) throws IOException, BadElementException {
         DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy:hh:mm:ss");
@@ -60,6 +72,15 @@ public class PDFGeneratorController {
         this.pdfGeneratorService.allStudentsWithImage(response);
     }
 
+    @Operation(
+            summary = "Generate PDF of teachers with images",
+            description = "Creates a PDF containing all teachers, including their images, " +
+                    "and sends it as a file download in the HTTP response."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "PDF successfully generated and sent"),
+            @ApiResponse(responseCode = "500", description = "Error occurred while generating the PDF")
+    })
     @GetMapping("/teachers/images")
     public void TeachersImagePDF(HttpServletResponse response) throws IOException, BadElementException {
         DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy:hh:mm:ss");

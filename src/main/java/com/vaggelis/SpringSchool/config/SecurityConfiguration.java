@@ -1,7 +1,6 @@
 package com.vaggelis.SpringSchool.config;
 
-import com.vaggelis.SpringSchool.models.Role;
-import com.vaggelis.SpringSchool.service.IUserService;
+import com.vaggelis.SpringSchool.service.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,8 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package com.vaggelis.SpringSchool.service.student;
 
-import com.vaggelis.SpringSchool.dto.PatchRequest;
-import com.vaggelis.SpringSchool.dto.SignUpRequest;
-import com.vaggelis.SpringSchool.dto.UpdateRequest;
+import com.vaggelis.SpringSchool.dto.request.PatchRequest;
+import com.vaggelis.SpringSchool.dto.request.SignUpRequest;
+import com.vaggelis.SpringSchool.dto.request.UpdateRequest;
 import com.vaggelis.SpringSchool.exception.student.StudentAlreadyExistsException;
 import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
 import com.vaggelis.SpringSchool.models.Student;

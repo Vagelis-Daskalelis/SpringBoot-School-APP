@@ -1,12 +1,12 @@
 package com.vaggelis.SpringSchool.controller;
 
-import com.vaggelis.SpringSchool.dto.JWTAuthenticationResponse;
-import com.vaggelis.SpringSchool.dto.ResetPasswordRequest;
-import com.vaggelis.SpringSchool.dto.SignInRequest;
-import com.vaggelis.SpringSchool.service.ICRUDService;
-import com.vaggelis.SpringSchool.service.IPasswordResetService;
+import com.vaggelis.SpringSchool.dto.response.JWTAuthenticationResponse;
+import com.vaggelis.SpringSchool.dto.request.ResetPasswordRequest;
+import com.vaggelis.SpringSchool.dto.request.SignInRequest;
+import com.vaggelis.SpringSchool.service.crud.ICRUDService;
+import com.vaggelis.SpringSchool.service.password.IPasswordResetService;
 import com.vaggelis.SpringSchool.service.image.IImageService;
-import com.vaggelis.SpringSchool.validator.SignUpValidator;
+import com.vaggelis.SpringSchool.validator.user.SignUpValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,6 +32,10 @@ public class UserController {
     private final IPasswordResetService passwordResetService;
     private final IImageService imageService;
 
+
+    // 🟩-----------------------------------------------
+    //  Sign in a user
+    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
@@ -71,6 +75,9 @@ public class UserController {
         // ---------------------------
     }
 
+    // 🟩-----------------------------------------------
+    //  Request password reset
+    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
@@ -108,6 +115,10 @@ public class UserController {
         // ---------------------------
     }
 
+
+    // 🟩-----------------------------------------------
+    //  Reset password
+    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
@@ -150,6 +161,10 @@ public class UserController {
         // ---------------------------
     }
 
+
+    // 🟩-----------------------------------------------
+    //  Logout user
+    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================

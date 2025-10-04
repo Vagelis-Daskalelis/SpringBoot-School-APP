@@ -1,15 +1,14 @@
 package com.vaggelis.SpringSchool.controller;
 
-import com.vaggelis.SpringSchool.dto.PatchRequest;
-import com.vaggelis.SpringSchool.dto.StudentReadDTO;
-import com.vaggelis.SpringSchool.dto.UpdateRequest;
+import com.vaggelis.SpringSchool.dto.request.PatchRequest;
+import com.vaggelis.SpringSchool.dto.student.StudentReadDTO;
 import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
 import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.service.student.IStudentService;
-import com.vaggelis.SpringSchool.validator.PatchValidator;
-import com.vaggelis.SpringSchool.validator.SignUpValidator;
-import com.vaggelis.SpringSchool.validator.UpdateValidator;
+import com.vaggelis.SpringSchool.validator.user.PatchValidator;
+import com.vaggelis.SpringSchool.validator.user.SignUpValidator;
+import com.vaggelis.SpringSchool.validator.user.UpdateValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

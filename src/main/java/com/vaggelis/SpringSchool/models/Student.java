@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,11 +29,28 @@ public class Student {
         this.user = user;
     }
 
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "student_course", joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"))
+    private List<Course> courses;
+
+    public void addCourse(Course course){
+        this.courses.add(course);
+        course.addStudent(this);
+    }
+
+    public void removeCourse(Course course){
+        this.courses.remove(course);
+        course.removeStudent(this);
+    }
+
     public Student(Long id, String firstname, String lastname) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
     }
+
+
 
     @Override
     public String toString() {

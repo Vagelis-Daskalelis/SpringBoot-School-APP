@@ -1,6 +1,9 @@
 package com.vaggelis.SpringSchool.controller;
 
-import com.vaggelis.SpringSchool.dto.*;
+import com.vaggelis.SpringSchool.dto.request.SignUpRequest;
+import com.vaggelis.SpringSchool.dto.request.UpdateRequest;
+import com.vaggelis.SpringSchool.dto.teacher.TeacherReadDTO;
+import com.vaggelis.SpringSchool.dto.user.UserReadDTO;
 import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
 import com.vaggelis.SpringSchool.exception.teacher.TeacherAlreadyExistsException;
 import com.vaggelis.SpringSchool.exception.teacher.TeacherNotFoundException;
@@ -9,11 +12,11 @@ import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.models.Teacher;
 import com.vaggelis.SpringSchool.models.User;
-import com.vaggelis.SpringSchool.service.ICRUDService;
+import com.vaggelis.SpringSchool.service.crud.ICRUDService;
 import com.vaggelis.SpringSchool.service.student.IStudentService;
 import com.vaggelis.SpringSchool.service.teacher.ITeacherService;
-import com.vaggelis.SpringSchool.validator.SignUpValidator;
-import com.vaggelis.SpringSchool.validator.UpdateValidator;
+import com.vaggelis.SpringSchool.validator.user.SignUpValidator;
+import com.vaggelis.SpringSchool.validator.user.UpdateValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -21,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -373,4 +377,75 @@ public class AdminController {
         // ---------------------------
     }
 
+
+    // ===========================
+    // Swagger Documentation
+    // ===========================
+    @Operation(
+            summary = "Assign a speciality to a teacher",
+            description = "Adds or updates a teacher's speciality using their IDs. " +
+                    "If the teacher already has a speciality, it will be replaced with the new one."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Speciality successfully assigned to the teacher",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = TeacherReadDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Teacher or Speciality not found")
+    })
+    @PutMapping("/speciality/teacher/{teacherId}/{specialityId}")
+    public ResponseEntity<TeacherReadDTO> addSpecialityToTeacher(
+            @Parameter(description = "The ID of the teacher to update", example = "1")
+            @PathVariable Long teacherId,
+
+            @Parameter(description = "The ID of the speciality to assign", example = "2")
+            @PathVariable Long specialityId
+    ) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
+        try {
+            Teacher teacher = teacherService.addSpecialityToTeacher(teacherId, specialityId);
+            TeacherReadDTO readDTO = Mapper.mappingTeacherToReadDto(teacher);
+
+            return new ResponseEntity<>(readDTO,HttpStatus.OK);
+        }catch (EntityNotFoundException e){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
+    }
+
+
+    // ===========================
+    // Swagger Documentation
+    // ===========================
+    @Operation(
+            summary = "Remove speciality from a teacher",
+            description = "Removes the associated speciality from the specified teacher " +
+                    "and returns the updated teacher information."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Speciality successfully removed"),
+            @ApiResponse(responseCode = "404", description = "Teacher not found")
+    })
+    @PutMapping("/speciality/teacher/{teacherId}")
+    public ResponseEntity<TeacherReadDTO> removeSpecialityFromTeacher(@PathVariable Long id) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+
+        try {
+            Teacher teacher = teacherService.removeSpecialityFromTeacher(id);
+            TeacherReadDTO readDTO = Mapper.mappingTeacherToReadDto(teacher);
+
+            return new ResponseEntity<>(readDTO, HttpStatus.OK);
+        } catch (TeacherNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
+    }
 }

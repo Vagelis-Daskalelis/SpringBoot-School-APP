@@ -22,6 +22,12 @@ public class ImageServiceImpl implements IImageService{
     private final IImageRepository imageRepository;
     private final IUserRepository userRepository;
 
+    /**Get an image by the id
+     *
+     * @param id
+     * @return Image
+     * @throws ImageNotFoundException
+     */
     @Override
     public Image getImageById(Long id) throws ImageNotFoundException {
         return imageRepository.findById(id)
@@ -29,18 +35,25 @@ public class ImageServiceImpl implements IImageService{
     }
 
 
+    /**Deletes your user's image
+     *
+     * @throws RuntimeException
+     */
     @Transactional
     @Override
     public void deleteImageById() throws RuntimeException {
+        // Get the logged-in user's email from the JWT authentication context
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Image image;
 
         try {
+            //Checks if the users exists
             User currentUser = userRepository.findByEmail(currentUserEmail)
                     .orElseThrow(() -> {
                         return new RuntimeException("User not found");
                     });
 
+            //Get the users image and if it exists it deletes it
             image = currentUser.getImage();
 
             if (image == null) throw new RuntimeException("Image not found");
@@ -52,15 +65,21 @@ public class ImageServiceImpl implements IImageService{
 
     }
 
-
+    /**Adds an image to your user
+     *
+     * @param file
+     */
     @Override
     public void addYourImage(MultipartFile file) {
+        // Get the logged-in user's email from the JWT authentication context
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
         try {
+            //Checks if the users exists
             User currentUser = userRepository.findByEmail(currentUserEmail)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            //Creates an image and adds it to your user
             Image image = new Image();
             image.setFileName(file.getOriginalFilename());
             image.setFileType(file.getContentType());
@@ -112,18 +131,27 @@ public class ImageServiceImpl implements IImageService{
 //        }
 //    }
 
+    /**Updates your users image
+     *
+     * @param file
+     * @throws RuntimeException
+     */
     @Override
     public void updateImage(MultipartFile file) throws RuntimeException {
+        // Get the logged-in user's email from the JWT authentication context
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Image image;
 
         try {
 
+            //Checks if the users exists
             User currentUser = userRepository.findByEmail(currentUserEmail)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            //Get the users image and if it exists it deletes it
             image = currentUser.getImage();
 
+            //Checks if user has an image and if yes updates it
             if (image == null) throw new RuntimeException("Image not found");
 
             image.setFileName(file.getOriginalFilename());
