@@ -6,15 +6,17 @@ import com.vaggelis.SpringSchool.dto.request.UpdateRequest;
 import com.vaggelis.SpringSchool.exception.student.StudentAlreadyExistsException;
 import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
 import com.vaggelis.SpringSchool.mapper.Mapper;
-import com.vaggelis.SpringSchool.models.Student;
-import com.vaggelis.SpringSchool.models.User;
+import com.vaggelis.SpringSchool.models.*;
+import com.vaggelis.SpringSchool.repository.ICourseRepository;
 import com.vaggelis.SpringSchool.repository.IStudentRepository;
 import com.vaggelis.SpringSchool.repository.IUserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,9 +28,10 @@ public class StudentServiceImpl implements IStudentService{
 
     private final IUserRepository userRepository;
     private final IStudentRepository studentRepository;
+    private final ICourseRepository courseRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /**Creates a Student and user STUDENT
+    /**Creates a Student and user with STUDENT role
      *
      * @param request
      * @return
@@ -146,7 +149,7 @@ public class StudentServiceImpl implements IStudentService{
         return targetStudent;
     }
 
-    /**Patches your student not your user
+    /**Patches the logged student not it's user
      *
      * @param request
      * @return
@@ -200,7 +203,7 @@ public class StudentServiceImpl implements IStudentService{
 
             //Maps the user to the update request
             Mapper.updateUserFromRequest(user, request, passwordEncoder);
-            //Maps the student to the update request
+                //Maps the student to the update request
             Mapper.updateStudentFromRequest(student, request);
 
 
@@ -211,6 +214,90 @@ public class StudentServiceImpl implements IStudentService{
         return student;
     }
 
+
+    /**Adds a course to a student
+     *
+     * @param studentId
+     * @param courseId
+     * @return
+     * @throws EntityNotFoundException
+     */
+    @Override
+    public Student addCourseToStudent(Long studentId, Long courseId) throws EntityNotFoundException {
+        Student student;
+        Course course;
+
+        try {
+            //Finds the student
+            student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+
+            //Finds the course
+            course = courseRepository.findById(courseId)
+                    .orElseThrow(() -> new EntityNotFoundException("Course not found"));
+
+
+            student.addCourse(course);
+            studentRepository.save(student);
+        }catch (EntityNotFoundException e){
+            throw e;
+        }
+        return student;
+    }
+
+    /**Removes a course from a student
+     *
+     * @param studentId
+     * @param courseId
+     * @return
+     * @throws EntityNotFoundException
+     */
+    @Override
+    public Student removeCourseFromStudent(Long studentId, Long courseId) throws EntityNotFoundException {
+        Student student;
+        Course course;
+
+        try {
+            //Finds the Student
+            student = studentRepository.findById(studentId)
+                    .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+            //Finds the course
+            course = courseRepository.findById(courseId)
+                    .orElseThrow(() -> new EntityNotFoundException("Course not found"));
+
+
+            student.removeCourse(course);
+            studentRepository.save(student);
+
+            //Finds if course has any students and if not it gets deleted
+            List<Student> students = studentsOfCourse(course);
+            if (students.isEmpty()) {courseRepository.delete(course);}
+        }catch (EntityNotFoundException e){
+            throw e;
+        }
+        return student;
+    }
+
+
+    /**Finds all the courses a student has
+     *
+     * @param id
+     * @return
+     * @throws StudentNotFoundException
+     */
+    @Override
+    public List<Course> findAllStudentsCourses(Long id) throws StudentNotFoundException {
+        return courseRepository.findAllCoursesByStudentId(id);
+    }
+
+    /**Finds all the students a course has
+     *
+     * @param course
+     * @return
+     */
+    private List<Student> studentsOfCourse(Course course){
+        return  course.getStudents().stream().toList();
+    }
 
 }
 

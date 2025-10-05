@@ -38,14 +38,12 @@ public class SpecialityController {
     private final SpecialityInsertValidator insertValidator;
     private final SpecialityUpdateValidator updateValidator;
 
-    // 🟩-----------------------------------------------
-    //  Add a new speciality
-    // 🟩-----------------------------------------------
+
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Add a new speciality",
+            summary = "Add a new speciality (ADMIN)",
             description = """
         Creates a new speciality in the system.
         The request body must include a valid `SpecialityInsertDTO`.
@@ -99,7 +97,7 @@ public class SpecialityController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Get a speciality by ID",
+            summary = "Get a speciality by ID (ADMIN)",
             description = """
         Retrieves the details of a specific speciality 
         based on its unique identifier (ID).
@@ -135,14 +133,12 @@ public class SpecialityController {
         // ---------------------------
     }
 
-    // 🟦-----------------------------------------------
-    // 📘 Get all specialities
-    // 🟦-----------------------------------------------
+
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Get all specialities",
+            summary = "Get all specialities (ADMIN)",
             description = """
         Retrieves a list of all available specialities 
         in the system.
@@ -182,15 +178,11 @@ public class SpecialityController {
     }
 
 
-
-    // 🟥-----------------------------------------------
-    // ❌ Delete a speciality by ID
-    // 🟥-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Delete a speciality by ID",
+            summary = "Delete a speciality by ID (ADMIN)",
             description = """
         Deletes a speciality based on the provided ID.
         If the speciality does not exist, a 404 (Not Found)
@@ -224,14 +216,11 @@ public class SpecialityController {
     }
 
 
-    // 🟩-----------------------------------------------
-    // ✏️ Update an existing speciality
-    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Update an existing speciality",
+            summary = "Update an existing speciality (ADMIN)",
             description = """
         Updates the details of an existing speciality using the provided data.
         If validation fails, a 400 (Bad Request) is returned.
@@ -250,22 +239,19 @@ public class SpecialityController {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    @PostMapping("/speciality/update")
+    @PutMapping("/speciality/update")
     public ResponseEntity<SpecialityReadDTO> updateSpeciality(
             @Valid @RequestBody SpecialityUpdateDTO dto,
             BindingResult bindingResult) {
         // ---------------------------
         // Method logic starts here
         // ---------------------------
-
-        // 🧩 Validate request data
         updateValidator.validate(dto, bindingResult);
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
-            // 🛠️ Update entity and map to DTO
             Speciality speciality = specialityService.updateSpeciality(dto);
             SpecialityReadDTO readDTO = Mapper.mapReadDtoSpeciality(speciality);
 

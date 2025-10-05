@@ -39,6 +39,9 @@ public class PDFGeneratorController {
 
     @GetMapping("/students")
     public void StudentsPDF(HttpServletResponse response) throws IOException{
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
         DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy:hh:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
 
@@ -48,10 +51,16 @@ public class PDFGeneratorController {
         response.setHeader(headerKey, headerValue);
 
         this.pdfGeneratorService.allStudents(response);
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
-            summary = "Generate PDF of students with images",
+            summary = "Generate PDF of students with images (ADMIN, TEACHER)",
             description = "Creates a PDF containing all students, including their images, " +
                     "and sends it as a file download in the HTTP response."
     )
@@ -61,6 +70,9 @@ public class PDFGeneratorController {
     })
     @GetMapping("/students/images")
     public void StudentsImagePDF(HttpServletResponse response) throws IOException, BadElementException {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
         DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy:hh:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
 
@@ -70,10 +82,16 @@ public class PDFGeneratorController {
         response.setHeader(headerKey, headerValue);
 
         this.pdfGeneratorService.allStudentsWithImage(response);
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 
+    // ===========================
+    // Swagger Documentation
+    // ===========================
     @Operation(
-            summary = "Generate PDF of teachers with images",
+            summary = "Generate PDF of teachers with images (ADMIN, TEACHER)",
             description = "Creates a PDF containing all teachers, including their images, " +
                     "and sends it as a file download in the HTTP response."
     )
@@ -83,6 +101,9 @@ public class PDFGeneratorController {
     })
     @GetMapping("/teachers/images")
     public void TeachersImagePDF(HttpServletResponse response) throws IOException, BadElementException {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
         DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy:hh:mm:ss");
         String currentDateTime = dateFormatter.format(new Date());
 
@@ -92,5 +113,41 @@ public class PDFGeneratorController {
         response.setHeader(headerKey, headerValue);
 
         this.pdfGeneratorService.allTeachersWithImage(response);
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
+    }
+
+
+    // ===========================
+    // Swagger Documentation
+    // ===========================
+    @Operation(
+            summary = "Generate PDF of all courses for the logged-in student (STUDENT)",
+            description = "Creates and returns a PDF file listing all courses associated with the currently authenticated student. " +
+                    "The PDF is returned as an attachment in the HTTP response."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "PDF generated successfully"),
+            @ApiResponse(responseCode = "403", description = "Forbidden - the user is not authorized to access this resource"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error - PDF generation failed")
+    })
+    @GetMapping("/students/courses")
+    public void StudentsCoursesPDF(HttpServletResponse response) throws IOException, BadElementException {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+        DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy:hh:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
+
+        response.setHeader(headerKey, headerValue);
+
+        this.pdfGeneratorService.allCoursesYourStudentHas(response);
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
     }
 }

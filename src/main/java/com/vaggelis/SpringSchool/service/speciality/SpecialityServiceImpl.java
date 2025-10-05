@@ -115,6 +115,7 @@ public class SpecialityServiceImpl implements ISpecialityService{
 
             //Maps the speciality to the specialityUpdatedto
             Mapper.mapSpecialityToUpdateDto(speciality, dto);
+            specialityRepository.save(speciality);
         }catch (SpecialityNotFoundException e){
             throw e;
         }

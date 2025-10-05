@@ -61,7 +61,7 @@ public class CRUDServiceImpl implements ICRUDService {
     }
 
     /**
-     * Creates Teacher and a user ADMIN
+     * Creates Teacher and a user with ADMIN role
      */
     @PostConstruct
     public void createAdmin(){

@@ -17,6 +17,7 @@ public class SpecialityUpdateValidator implements Validator {
     public void validate(Object target, Errors errors) {
         SpecialityUpdateDTO dto = (SpecialityUpdateDTO) target;
 
+        // Validate the name
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "name.empty", "Name is required.");
         if (dto.getName() != null && (dto.getName().length() > 20)) {
             errors.rejectValue("name", "name.size", "Name must be between 3 and 20 characters.");

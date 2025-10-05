@@ -40,7 +40,7 @@ public class StudentController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "View student profile",
+            summary = "View logged student profile (STUDENT)",
             description = "Retrieves the profile details of a student by ID"
     )
     @ApiResponses(value = {
@@ -91,7 +91,7 @@ public class StudentController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Patch student details",
+            summary = "Patch logged student details (STUDENT)",
             description = "Updates specific fields of a student using a patch request"
     )
     @ApiResponses(value = {

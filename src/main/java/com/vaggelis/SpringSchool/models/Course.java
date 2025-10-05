@@ -8,7 +8,9 @@ import lombok.Setter;
 
 import java.sql.Time;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,13 +24,8 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @Enumerated(EnumType.STRING)
-    @Column(name = "week_day")
-    private DayOfWeek dayOfWeek;
-    @Column(name = "start_date")
-    private LocalDateTime startDateTime;
-    @Column(name = "end_date")
-    private LocalDateTime endDateTime;
+    private LocalDate date;
+    private int hours;
 
 
     @ManyToMany(mappedBy = "courses")
@@ -42,11 +39,10 @@ public class Course {
         this.students.remove(student);
     }
 
-    public Course(Long id, String name, DayOfWeek dayOfWeek, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    public Course(Long id, String name, LocalDate date, int hours) {
         this.id = id;
         this.name = name;
-        this.dayOfWeek = dayOfWeek;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
+        this.date = date;
+        this.hours = hours;
     }
 }

@@ -10,4 +10,5 @@ public interface IPDFGeneratorService {
     void allStudents(HttpServletResponse response) throws IOException;
     void allStudentsWithImage(HttpServletResponse response) throws IOException, BadElementException;
     void allTeachersWithImage(HttpServletResponse response) throws IOException, BadElementException;
+    void allCoursesYourStudentHas(HttpServletResponse response) throws IOException, BadElementException;
 }

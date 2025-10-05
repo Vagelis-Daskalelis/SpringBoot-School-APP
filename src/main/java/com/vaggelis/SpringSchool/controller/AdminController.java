@@ -55,7 +55,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Creates a teacher",
+            summary = "Creates a teacher  (ADMIN)",
             description = "Registers a new teacher with the provided sign-up information"
     )
     @ApiResponses(value = {
@@ -110,7 +110,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Find a user by email",
+            summary = "Find a user by email (ADMIN)",
             description = "Retrieves a user by their email address and returns user details"
     )
     @ApiResponses(value = {
@@ -156,7 +156,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Get all users",
+            summary = "Get all users (ADMIN)",
             description = "Retrieves a list of all users and returns their details"
     )
     @ApiResponses(value = {
@@ -199,7 +199,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Delete a teacher by ID",
+            summary = "Delete a teacher by ID (ADMIN)",
             description = "Deletes a teacher from the system by their ID and returns the deleted teacher details"
     )
     @ApiResponses(value = {
@@ -243,7 +243,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Delete a student by ID",
+            summary = "Delete a student by ID (ADMIN)",
             description = "Deletes a student from the system by their ID and returns the deleted student details"
     )
     @ApiResponses(value = {
@@ -287,7 +287,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Update teacher and user details",
+            summary = "Update teacher and user details (ADMIN)",
             description = "Updates the information of a teacher and their associated user account"
     )
     @ApiResponses(value = {
@@ -343,7 +343,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Change user status",
+            summary = "Change user status (ADMIN)",
             description = "Toggles a user's status between ACTIVE and BANNED"
     )
     @ApiResponses(value = {
@@ -382,7 +382,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Assign a speciality to a teacher",
+            summary = "Assign a speciality to a teacher (ADMIN)",
             description = "Adds or updates a teacher's speciality using their IDs. " +
                     "If the teacher already has a speciality, it will be replaced with the new one."
     )
@@ -392,7 +392,7 @@ public class AdminController {
                             schema = @Schema(implementation = TeacherReadDTO.class))),
             @ApiResponse(responseCode = "404", description = "Teacher or Speciality not found")
     })
-    @PutMapping("/speciality/teacher/{teacherId}/{specialityId}")
+    @PutMapping("/speciality/teacher/add/{teacherId}/{specialityId}")
     public ResponseEntity<TeacherReadDTO> addSpecialityToTeacher(
             @Parameter(description = "The ID of the teacher to update", example = "1")
             @PathVariable Long teacherId,
@@ -422,7 +422,7 @@ public class AdminController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Remove speciality from a teacher",
+            summary = "Remove speciality from a teacher (ADMIN)",
             description = "Removes the associated speciality from the specified teacher " +
                     "and returns the updated teacher information."
     )
@@ -430,7 +430,7 @@ public class AdminController {
             @ApiResponse(responseCode = "200", description = "Speciality successfully removed"),
             @ApiResponse(responseCode = "404", description = "Teacher not found")
     })
-    @PutMapping("/speciality/teacher/{teacherId}")
+    @PutMapping("/speciality/teacher/remove/{teacherId}")
     public ResponseEntity<TeacherReadDTO> removeSpecialityFromTeacher(@PathVariable Long id) {
         // ---------------------------
         // Method logic starts here

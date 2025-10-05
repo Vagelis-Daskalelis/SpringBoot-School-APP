@@ -33,16 +33,25 @@ public class TeacherServiceImpl implements ITeacherService{
     private final ISpecialityRepository specialityRepository;
     private final PasswordEncoder passwordEncoder;
 
-    //Creates a Teacher
+
+    /**Creates a Student and user with STUDENT role
+     *
+     * @param request
+     * @return
+     * @throws TeacherAlreadyExistsException
+     */
     @Override
     public Teacher teacherSignUp(SignUpRequest request) throws TeacherAlreadyExistsException {
         User user;
         Teacher teacher;
 
         try {
+            //Maps student to the signup request
             teacher = Mapper.extractTeacherFromSignUpRequest(request);
+            //Maps user to the signup request
             user = Mapper.extractUserWithTeacherRoleFromSignUpRequest(request, passwordEncoder);
 
+            //Checks if the user already exists
             Optional<User> returnedUser = userRepository.findByEmail(request.getEmail());
 
             if (returnedUser.isPresent()) throw new TeacherAlreadyExistsException(Teacher.class, request.getEmail());
@@ -60,11 +69,18 @@ public class TeacherServiceImpl implements ITeacherService{
         return teacher;
     }
 
+    /**Finds teacher by the id
+     *
+     * @param id
+     * @return
+     * @throws TeacherNotFoundException
+     */
     @Override
     public Teacher findTeacherById(Long id) throws TeacherNotFoundException {
         Teacher teacher;
 
         try {
+            //Find the student by the id
             teacher = teacherRepository.findTeacherById(id);
             if (teacher == null) throw new TeacherNotFoundException(Teacher.class, teacher.getId());
         }catch (TeacherNotFoundException e){
@@ -74,18 +90,27 @@ public class TeacherServiceImpl implements ITeacherService{
     }
 
 
-    //Finds all Teachers
+    /**Finds all teachers
+     *
+     * @return
+     */
     @Override
     public List<Teacher> findAllTeachers() {
         return teacherRepository.findAll();
     }
 
-    //Deletes a teacher by its id
+    /**Deletes a teacher by its id
+     *
+     * @param id
+     * @return
+     * @throws TeacherNotFoundException
+     */
     @Override
     public Teacher deleteTeacher(Long id) throws TeacherNotFoundException {
         Teacher teacher;
 
         try {
+            //Find the teacher by the id and if it exists it gets deleted
             teacher = teacherRepository.findTeacherById(id);
             if (teacher == null) throw new TeacherNotFoundException(Teacher.class, teacher.getId());
             teacherRepository.delete(teacher);
@@ -95,18 +120,28 @@ public class TeacherServiceImpl implements ITeacherService{
         return teacher;
     }
 
+    /**Updates both the user and the teacher
+     *
+     * @param request
+     * @return
+     * @throws TeacherNotFoundException
+     */
     @Override
     public Teacher updateTeacherAndUser(UpdateRequest request)throws TeacherNotFoundException {
         User user;
         Teacher teacher;
 
         try {
+            //Finds the teacher by the id
             teacher = teacherRepository.findTeacherById(request.getId());
             if (teacher == null) throw new TeacherNotFoundException(Student.class, request.getId());
 
+            //Gets the teacher's user
             user = teacher.getUser();
 
+            //Maps the user to the update request
             Mapper.updateUserFromRequest(user, request, passwordEncoder);
+            //Maps the student to the update request
             Mapper.updateTeacherFromRequest(teacher, request);
 
 
@@ -117,23 +152,33 @@ public class TeacherServiceImpl implements ITeacherService{
         return teacher;
     }
 
+    /**Patches the logged teacher not it's user
+     *
+     * @param request
+     * @return
+     * @throws TeacherNotFoundException
+     */
     @Override
     public Teacher patchYourTeacher(PatchRequest request) throws TeacherNotFoundException {
+        // Get the logged-in user's email from the JWT authentication context
         String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         Teacher targetTeacher;
 
         try {
+            // Find the logged-in user
             User currentUser = userRepository.findByEmail(currentUserEmail)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            // Find the teacher
             targetTeacher = teacherRepository.findById(request.getId())
                     .orElseThrow(() -> new TeacherNotFoundException(Teacher.class, request.getId()));
 
+            //Checks if exists
             if (!targetTeacher.getUser().getId().equals(currentUser.getId())){
                 throw new SecurityException("You are not authorized to see this profile");
             }
 
-            // Use the mapper to update only student fields
+            // Use the mapper to update only teacher fields
             Mapper.patchTeacherFromRequest(targetTeacher, request);
         } catch (TeacherNotFoundException e) {
             throw  e;
@@ -141,16 +186,25 @@ public class TeacherServiceImpl implements ITeacherService{
         return teacherRepository.save(targetTeacher);
         }
 
-
+    /**Adds a course to a student
+     *
+     * Each time it is used the old speciality gets replaced by the new one
+     * @param teacherId
+     * @param specialityId
+     * @return
+     * @throws EntityNotFoundException
+     */
     @Override
     public Teacher addSpecialityToTeacher(Long teacherId, Long specialityId) throws EntityNotFoundException {
         Teacher teacher;
         Speciality speciality;
 
         try {
+            //Finds the teacher
             teacher = teacherRepository.findById(teacherId)
                     .orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
 
+            //Finds the speciality
             speciality = specialityRepository.findById(specialityId)
                     .orElseThrow(() -> new EntityNotFoundException("Speciality not found"));
 
@@ -164,14 +218,22 @@ public class TeacherServiceImpl implements ITeacherService{
         return teacher;
     }
 
+    /**Remove course from a student
+     *
+     * @param id
+     * @return
+     * @throws TeacherNotFoundException
+     */
     @Override
     public Teacher removeSpecialityFromTeacher(Long id) throws TeacherNotFoundException {
         Teacher teacher;
         Speciality speciality;
 
         try {
+            //Finds the teacher
             teacher = teacherRepository.findById(id)
                     .orElseThrow(() -> new TeacherNotFoundException(Teacher.class, id));
+            //Get his speciality and remove it
             speciality = teacher.getSpeciality();
 
             teacher.removeSpeciality(speciality);

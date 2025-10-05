@@ -1,10 +1,13 @@
 package com.vaggelis.SpringSchool.dto.student;
 
+import com.vaggelis.SpringSchool.dto.course.CourseReadDTO;
 import com.vaggelis.SpringSchool.dto.user.UserReadDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,4 +18,5 @@ public class StudentReadDTO {
     private String firstname;
     private String lastname;
     private UserReadDTO user;
+    private List<CourseReadDTO> courses;
 }

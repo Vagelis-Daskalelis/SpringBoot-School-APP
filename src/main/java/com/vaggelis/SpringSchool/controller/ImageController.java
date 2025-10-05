@@ -26,14 +26,12 @@ public class ImageController {
 
     private final IImageService imageService;
 
-    // 🟩-----------------------------------------------
-    //  Add a new Image
-    // 🟩-----------------------------------------------
+
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Upload an image",
+            summary = "Upload logged user's image (ADMIN, TEACHER, STUDENT)",
             description = "Uploads an image file to the server"
     )
     @ApiResponses(value = {
@@ -72,13 +70,10 @@ public class ImageController {
     }
 
 
-    // 🟦-----------------------------------------------
-    //  Get an Image by Id
-    // 🟦-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
-    @Operation(summary = "Download image by ID")
+    @Operation(summary = "Download image by ID (ADMIN, TEACHER, STUDENT)")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
@@ -112,14 +107,12 @@ public class ImageController {
         // ---------------------------
     }
 
-    // 🟥-----------------------------------------------
-    //  Delete an Image by Id
-    // 🟥-----------------------------------------------
+
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Delete current user's image",
+            summary = "Delete current user's image (ADMIN, TEACHER, STUDENT)",
             description = "Deletes the image associated with the currently authenticated user"
     )
     @ApiResponses(value = {
@@ -159,14 +152,11 @@ public class ImageController {
     }
 
 
-    // 🟧-----------------------------------------------
-    //  Update an Image
-    // 🟧-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Update current user's image",
+            summary = "Update current user's image (ADMIN, TEACHER, STUDENT)",
             description = "Replaces the image associated with the currently authenticated user"
     )
     @ApiResponses(value = {

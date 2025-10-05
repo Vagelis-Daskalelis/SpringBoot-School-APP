@@ -1,28 +1,5 @@
 package com.vaggelis.SpringSchool.service.pdf;
 
-//import com.lowagie.text.*;
-//import com.lowagie.text.pdf.PdfPCell;
-//import com.lowagie.text.pdf.PdfPTable;
-//import com.lowagie.text.pdf.PdfWriter;
-//import com.vaggelis.SpringSchool.dto.image.ImageReadDTO;
-//import com.vaggelis.SpringSchool.dto.student.StudentReadDTO;
-//import com.vaggelis.SpringSchool.mapper.Mapper;
-//import com.vaggelis.SpringSchool.models.Student;
-//import com.vaggelis.SpringSchool.repository.IStudentRepository;
-//import jakarta.servlet.http.HttpServletResponse;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.slf4j.Slf4j;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
-//import org.springframework.stereotype.Service;
-//import com.lowagie.text.Image;
-//
-//import java.io.IOException;
-//import java.util.List;
-//import java.util.stream.Collectors;
-//import java.util.stream.Stream;
-
-
 import com.lowagie.text.*;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfPCell;
@@ -31,16 +8,23 @@ import com.lowagie.text.pdf.PdfWriter;
 import com.vaggelis.SpringSchool.dto.image.ImageReadDTO;
 import com.vaggelis.SpringSchool.dto.student.StudentReadDTO;
 import com.vaggelis.SpringSchool.dto.teacher.TeacherReadDTO;
+import com.vaggelis.SpringSchool.exception.student.StudentNotFoundException;
 import com.vaggelis.SpringSchool.mapper.Mapper;
+import com.vaggelis.SpringSchool.models.Course;
 import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.models.Teacher;
+import com.vaggelis.SpringSchool.models.User;
 import com.vaggelis.SpringSchool.repository.IStudentRepository;
 import com.vaggelis.SpringSchool.repository.ITeacherRepository;
+import com.vaggelis.SpringSchool.repository.IUserRepository;
+import com.vaggelis.SpringSchool.service.student.IStudentService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -49,8 +33,10 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
 
+    private final IUserRepository userRepository;
     private final IStudentRepository studentRepository;
     private final ITeacherRepository teacherRepository;
+    private final IStudentService studentService;
 
     @Override
     public void export(HttpServletResponse response) throws IOException {
@@ -227,7 +213,7 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
     @Override
     public void allTeachersWithImage(HttpServletResponse response) throws IOException, DocumentException, com.itextpdf.text.BadElementException {
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=students.pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=teachers.pdf");
 
         Document document = new Document(PageSize.A4.rotate());
         PdfWriter.getInstance(document, response.getOutputStream());
@@ -244,14 +230,14 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
         document.add(Chunk.NEWLINE);
 
         // Table
-        PdfPTable table = new PdfPTable(7);
+        PdfPTable table = new PdfPTable(8);
         table.setWidthPercentage(100);
         table.setSpacingBefore(10f);
         table.setSpacingAfter(10f);
-        table.setWidths(new float[]{1f, 2f, 2f, 4f, 4f, 2f, 3f});
+        table.setWidths(new float[]{1f, 2f, 2f, 4f, 4f, 2f, 3f, 2f});
 
         // Table headers
-        Stream.of("ID", "Firstname", "Lastname", "Username", "Email", "Status", "Image")
+        Stream.of("ID", "Firstname", "Lastname", "Username", "Email", "Status", "Image", "Speciality")
                 .forEach(headerTitle -> {
                     PdfPCell header = new PdfPCell();
                     Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
@@ -276,7 +262,7 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
                 if (teacher.getUser().getImage() != null && teacher.getUser().getImage().getImage() != null) {
                     byte[] imgBytes = teacher.getUser().getImage().getImage();
                     Image pdfImg = Image.getInstance(imgBytes);
-                    pdfImg.scaleToFit(50, 50);
+                    pdfImg.scaleToFit(70, 70);
 
                     PdfPCell imageCell = new PdfPCell();
                     imageCell.addElement(pdfImg);
@@ -287,6 +273,14 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
                     table.addCell(""); // empty cell
                 }
 
+                // Speciality cell
+                if (teacher.getSpeciality() != null && teacher.getSpeciality().getName() != null) {
+
+                    table.addCell(teacher.getSpeciality().getName());
+                }else {
+                    table.addCell("");
+                }
+
             } catch (Exception e) {
                 // Add an empty cell so the table layout doesn't break
                 table.addCell("");
@@ -295,5 +289,85 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
 
         document.add(table);
         document.close();
+    }
+
+    /**Creates a PDF of the courses a logged student has
+     *
+     * @param response
+     * @throws IOException
+     * @throws com.itextpdf.text.BadElementException
+     * @throws DocumentException
+     */
+    @Override
+    public void allCoursesYourStudentHas(HttpServletResponse response)
+            throws IOException, com.itextpdf.text.BadElementException, DocumentException {
+
+        // Get the logged-in user's email from the JWT authentication context
+        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        Student targetStudent;
+
+        try {
+            // Find the logged-in user
+            User currentUser = userRepository.findByEmail(currentUserEmail)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Find the student
+            targetStudent = studentRepository.findByUser(currentUser)
+                    .orElseThrow(() -> new StudentNotFoundException(Student.class, currentUser.getId()));
+
+            // Authorization check
+            if (!targetStudent.getUser().getId().equals(currentUser.getId())) {
+                throw new SecurityException("You are not authorized to see this profile");
+            }
+
+            // Set response headers
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=courses.pdf");
+
+            Document document = new Document(PageSize.A4.rotate());
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
+
+            // Title
+            Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20);
+            Paragraph title = new Paragraph("Your Courses", fontTitle);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+            document.add(Chunk.NEWLINE);
+
+            // Table
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+            table.setSpacingBefore(10f);
+            table.setSpacingAfter(10f);
+            table.setWidths(new float[]{2f, 4f, 3f, 2f});
+
+            // Table headers
+            Stream.of("ID", "Name", "Date", "Hours")
+                    .forEach(headerTitle -> {
+                        PdfPCell header = new PdfPCell();
+                        Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+                        header.setPhrase(new Phrase(headerTitle, headFont));
+                        header.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        table.addCell(header);
+                    });
+
+            // Table rows
+            List<Course> courses = studentService.findAllStudentsCourses(targetStudent.getId());
+            for (Course course : courses) {
+                table.addCell(String.valueOf(course.getId()));
+                table.addCell(course.getName());
+                table.addCell(course.getDate().format(DateTimeFormatter.ofPattern("d/M/yyyy")));
+                table.addCell(String.valueOf(course.getHours()));
+            }
+
+            document.add(table);
+            document.close();
+
+        } catch (StudentNotFoundException | SecurityException e) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, e.getMessage());
+        } catch (Exception e) {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 }

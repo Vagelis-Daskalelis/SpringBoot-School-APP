@@ -16,6 +16,8 @@ import com.vaggelis.SpringSchool.dto.user.UserReadDTO;
 import com.vaggelis.SpringSchool.models.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
+
 
 public class Mapper {
 
@@ -66,9 +68,23 @@ private Mapper() {} // prevent instantiation
     }
 
 
-    //Maps Student to StudentReadDto
-    public static StudentReadDTO mappingStudentToReadDto(Student student){
-        return new StudentReadDTO(student.getId(), student.getFirstname(), student.getLastname(), Mapper.mappingUserToReadDto(student.getUser()));
+    // Maps Student to StudentReadDto
+    public static StudentReadDTO mappingStudentToReadDto(Student student) {
+        List<CourseReadDTO> courseDTOs = null;
+
+        if (student.getCourses() != null && !student.getCourses().isEmpty()) {
+            courseDTOs = student.getCourses().stream()
+                    .map(Mapper::mapReadDtoTOCourse) // convert each Course to CourseReadDTO
+                    .toList();
+        }
+
+        return new StudentReadDTO(
+                student.getId(),
+                student.getFirstname(),
+                student.getLastname(),
+                Mapper.mappingUserToReadDto(student.getUser()),
+                courseDTOs
+        );
     }
 
 
@@ -190,20 +206,19 @@ private Mapper() {} // prevent instantiation
     // ===========================
 
     // Creates a course from CourseInsertDTO
-    private static Course mapCourseToInsertDto(CourseInsertDTO dto){
-        return new Course(null, dto.getName(), dto.getDayOfWeek(), dto.getStartDateTime(), dto.getEndDateTime());
+    public static Course mapCourseToInsertDto(CourseInsertDTO dto){
+        return new Course(null, dto.getName(), dto.getDate(), dto.getHours());
     }
 
     //Maps CourseUpdateDTO  to the course
-    private static void mapCourseToUpdateDto(Course course, CourseUpdateDTO dto){
+    public static void mapCourseToUpdateDto(Course course, CourseUpdateDTO dto){
         course.setName(dto.getName());
-        course.setDayOfWeek(dto.getDayOfWeek());
-        course.setStartDateTime(dto.getStartDateTime());
-        course.setEndDateTime(dto.getEndDateTime());
+        course.setDate(dto.getDate());
+        course.setHours(dto.getHours());
     }
 
     //Maps Course to CourseReadDTO
-    private static CourseReadDTO mapReadDtoTOCourse(Course course){
-        return new CourseReadDTO(course.getId(), course.getName(), course.getDayOfWeek(), course.getStartDateTime(), course.getEndDateTime());
+    public static CourseReadDTO mapReadDtoTOCourse(Course course){
+        return new CourseReadDTO(course.getId(), course.getName(), course.getDate(), course.getHours());
     }
 }

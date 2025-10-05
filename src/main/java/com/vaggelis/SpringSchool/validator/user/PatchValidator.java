@@ -17,11 +17,13 @@ public class PatchValidator implements Validator {
     public void validate(Object target, Errors errors) {
         PatchRequest request = (PatchRequest) target;
 
+        //Validate the firstname
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "firstname", "firstname.empty", "Firstname is required.");
         if (request.getFirstname() != null && (request.getFirstname().length() < 3 || request.getFirstname().length() > 20)) {
             errors.rejectValue("firstname", "firstname.size", "Firstname must be between 3 and 20 characters.");
         }
 
+        //Validate the lastname
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "lastname", "lastname.empty", "Lastname is required.");
         if (request.getLastname() != null && (request.getLastname().length() < 3 || request.getLastname().length() > 20)) {
             errors.rejectValue("lastname", "lastname.size", "Lastname must be between 3 and 20 characters.");

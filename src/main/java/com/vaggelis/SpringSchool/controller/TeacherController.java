@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -55,7 +56,7 @@ public class TeacherController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Creates a student",
+            summary = "Creates a student (ADMIN, TEACHER)",
             description = "Registers a new student with the provided sign-up information"
     )
     @ApiResponses(value = {
@@ -111,7 +112,7 @@ public class TeacherController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Find a student by ID",
+            summary = "Find a student by ID (ADMIN, TEACHER)",
             description = "Retrieves a student by their ID and returns the student details"
     )
     @ApiResponses(value = {
@@ -157,7 +158,7 @@ public class TeacherController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Find a teacher by ID",
+            summary = "Find a teacher by ID (ADMIN, TEACHER)",
             description = "Retrieves a teacher by their ID and returns the teacher details"
     )
     @ApiResponses(value = {
@@ -202,7 +203,7 @@ public class TeacherController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Get all teachers",
+            summary = "Get all teachers (ADMIN, TEACHER)",
             description = "Retrieves a list of all teachers and returns their details"
     )
     @ApiResponses(value = {
@@ -245,7 +246,7 @@ public class TeacherController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Get all students",
+            summary = "Get all students (ADMIN, TEACHER)",
             description = "Retrieves a list of all students and returns their details"
     )
     @ApiResponses(value = {
@@ -289,7 +290,7 @@ public class TeacherController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Update student and user details",
+            summary = "Update student and user details (ADMIN, TEACHER)",
             description = "Updates the information of a student and their associated user account"
     )
     @ApiResponses(value = {
@@ -345,7 +346,7 @@ public class TeacherController {
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Patch teacher details",
+            summary = "Patch logged teacher details (ADMIN, TEACHER)",
             description = "Updates specific fields of a teacher using a patch request"
     )
     @ApiResponses(value = {
@@ -390,6 +391,82 @@ public class TeacherController {
             TeacherReadDTO readDTO = Mapper.mappingTeacherToReadDto(teacher);
             return new ResponseEntity<>(readDTO, HttpStatus.OK);
         } catch (TeacherNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
+    }
+
+
+    // ===========================
+    // Swagger Documentation
+    // ===========================
+    @Operation(
+            summary = "Assign a course to a student (ADMIN, TEACHER)",
+            description = "Adds a course to a specific student's list of courses by their IDs"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Course successfully assigned to student",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = StudentReadDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Student or course not found")
+    })
+    @PutMapping("/student/course/add/{studentId}/{courseId}")
+    public ResponseEntity<StudentReadDTO> addCourseToStudent(
+            @Parameter(description = "ID of the student", required = true, example = "1")
+            @PathVariable Long studentId,
+
+            @Parameter(description = "ID of the course to assign", required = true, example = "2")
+            @PathVariable Long courseId
+    ) {
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+        try {
+            Student student = studentService.addCourseToStudent(studentId, courseId);
+            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
+
+            return new ResponseEntity<>(readDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        // ---------------------------
+        // Method logic ends here
+        // ---------------------------
+    }
+
+
+
+    // ===========================
+    // Swagger Documentation
+    // ===========================
+    @Operation(
+            summary = "Remove a course from a student (ADMIN, TEACHER)",
+            description = "Removes the association of a course from a specific student by their IDs"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Course successfully removed from student",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = StudentReadDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Student or course not found")
+    })
+    @PutMapping("/student/course/remove/{studentId}/{courseId}")
+    public ResponseEntity<StudentReadDTO> removeCourseFromStudent(
+            @Parameter(description = "ID of the student", required = true)
+            @PathVariable Long studentId,
+            @Parameter(description = "ID of the course to remove", required = true)
+            @PathVariable Long courseId) {
+
+        // ---------------------------
+        // Method logic starts here
+        // ---------------------------
+        try {
+            Student student = studentService.removeCourseFromStudent(studentId, courseId);
+            StudentReadDTO readDTO = Mapper.mappingStudentToReadDto(student);
+
+            return new ResponseEntity<>(readDTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         // ---------------------------

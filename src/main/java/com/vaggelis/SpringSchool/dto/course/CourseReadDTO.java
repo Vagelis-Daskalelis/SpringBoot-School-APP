@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 public class CourseReadDTO {
     private Long id;
     private String name;
-    private DayOfWeek dayOfWeek;
-    private LocalDateTime startDateTime;
-    private LocalDateTime endDateTime;
+    private LocalDate date;
+    private int hours;
 }

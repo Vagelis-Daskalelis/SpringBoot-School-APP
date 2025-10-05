@@ -33,14 +33,11 @@ public class UserController {
     private final IImageService imageService;
 
 
-    // 🟩-----------------------------------------------
-    //  Sign in a user
-    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Sign in a user",
+            summary = "Sign in a user (ALL)",
             description = "Authenticates a user and returns a JWT token"
     )
     @ApiResponses(value = {
@@ -75,14 +72,11 @@ public class UserController {
         // ---------------------------
     }
 
-    // 🟩-----------------------------------------------
-    //  Request password reset
-    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Request password reset",
+            summary = "Request password reset (ALL)",
             description = "Sends a password reset link to the specified email address"
     )
     @ApiResponses(value = {
@@ -116,14 +110,11 @@ public class UserController {
     }
 
 
-    // 🟩-----------------------------------------------
-    //  Reset password
-    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Reset password",
+            summary = "Reset password (ALL)",
             description = "Resets the user's password using a valid password reset token"
     )
     @ApiResponses(value = {
@@ -162,14 +153,11 @@ public class UserController {
     }
 
 
-    // 🟩-----------------------------------------------
-    //  Logout user
-    // 🟩-----------------------------------------------
     // ===========================
     // Swagger Documentation
     // ===========================
     @Operation(
-            summary = "Logout user",
+            summary = "Logout user (ALL)",
             description = "Logs out the currently authenticated user"
     )
     @ApiResponses(value = {
