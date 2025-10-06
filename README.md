@@ -121,14 +121,16 @@
 ### - Swagger documentation for API testing
 
 ## 🔗 Main Endpoints
-- `/api/user/**` : Registration & login (open to all)
-- `/api/student/**` : Student-specific actions (requires STUDENT role)
-- `/api/teacher/**` : Teacher-specific actions (requires TEACHER or ADMIN role)
-- `/api/admin/**` : Admin-only actions
-- `/api/course/**` : Course management (requires ADMIN role)
-- `/api/speciality/**` : Specialities management (ADMIN only)
-- `/api/image/**` : Image upload/download (requires any authenticated role)
-- `/api/pdf/**` : Generate PDFs for student courses (requires any authenticated role)
+
+- [ `/api/user/**` ](http://localhost:8089/api/user/) : Registration & login (open to all)
+- [ `/api/student/**` ](http://localhost:8089/api/student/) : Student-specific actions (requires STUDENT role)
+- [ `/api/teacher/**` ](http://localhost:8089/api/teacher/) : Teacher-specific actions (requires TEACHER or ADMIN role)
+- [ `/api/admin/**` ](http://localhost:8089/api/admin/) : Admin-only actions
+- [ `/api/course/**` ](http://localhost:8089/api/course/) : Course management (requires ADMIN role)
+- [ `/api/speciality/**` ](http://localhost:8089/api/speciality/) : Specialities management (ADMIN only)
+- [ `/api/image/**` ](http://localhost:8089/api/image/) : Image upload/download (requires any authenticated role)
+- [ `/api/pdf/**` ](http://localhost:8089/api/pdf/) : Generate PDFs for student courses (requires any authenticated role)
+
 
 ## 🔐 Security Notes
 - JWT-based authentication is applied to all endpoints except `/api/user/**` and Swagger UI.
