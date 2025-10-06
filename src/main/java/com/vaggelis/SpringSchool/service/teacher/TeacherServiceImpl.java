@@ -15,7 +15,6 @@ import com.vaggelis.SpringSchool.repository.ITeacherRepository;
 import com.vaggelis.SpringSchool.repository.IUserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class TeacherServiceImpl implements ITeacherService{
 
     private final IUserRepository userRepository;
@@ -58,11 +56,7 @@ public class TeacherServiceImpl implements ITeacherService{
 
             teacher.addUser(user);
             teacherRepository.save(teacher);
-
-            log.info("Teacher user added: {}", user.getEmail());
-            log.info("Teacher added: {} , {}", teacher.getFirstname(), teacher.getLastname());
         }catch (TeacherAlreadyExistsException e){
-            log.error(e.getMessage());
             throw e;
         }
 
@@ -244,28 +238,3 @@ public class TeacherServiceImpl implements ITeacherService{
         return teacher;
     }
 }
-
-
-//    @Override
-//    public void teacherSignUp(SignUpRequest request) throws TeacherAlreadyExistsException {
-//        // Check if user with email already exists
-//        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-//            throw new TeacherAlreadyExistsException(Teacher.class, request.getEmail());
-//        }
-//
-//        // Create User with teacher role
-//        User user = UserMapper.extractUserWithTeacherRoleFromSignUpRequest(request, passwordEncoder);
-//
-//        // Create Teacher and associate User
-//        Teacher teacher = UserMapper.extractTeacherFromSignUpRequest(request);
-//        teacher.addUser(user);
-//
-//        // Save Teacher (user will be saved automatically due to CascadeType.ALL)
-//        try {
-//            teacherRepository.save(teacher);
-//            log.info("Teacher added successfully: {}", teacher.getFirstname() + " " + teacher.getLastname());
-//        } catch (Exception e) {
-//            log.error("Error saving teacher: {}", e.getMessage());
-//            throw new RuntimeException("Failed to save teacher", e);
-//        }
-//    }

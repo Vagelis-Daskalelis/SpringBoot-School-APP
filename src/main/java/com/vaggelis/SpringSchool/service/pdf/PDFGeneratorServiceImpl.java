@@ -38,91 +38,6 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
     private final ITeacherRepository teacherRepository;
     private final IStudentService studentService;
 
-    @Override
-    public void export(HttpServletResponse response) throws IOException {
-        Document document = new Document(PageSize.A4);
-        PdfWriter.getInstance(document, response.getOutputStream());
-
-        document.open();
-        Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-        fontTitle.setSize(18);
-
-        Paragraph paragraph = new Paragraph("This is a title", fontTitle);
-        paragraph.setAlignment(Paragraph.ALIGN_CENTER);
-
-        Font fontParagraph = FontFactory.getFont(FontFactory.HELVETICA);
-        fontParagraph.setSize(12);
-
-        Paragraph paragraph2 = new Paragraph("Tis is a paragraph", fontParagraph);
-        paragraph2.setAlignment(Paragraph.ALIGN_LEFT);
-
-        document.add(paragraph);
-        document.add(paragraph2);
-        document.close();
-    }
-
-
-    @Override
-    public void allStudents(HttpServletResponse response) throws IOException, DocumentException {
-        // Set PDF content type
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition", "attachment; filename=students.pdf");
-
-        Document document = new Document(PageSize.A4.rotate()); // Landscape for more space
-        PdfWriter.getInstance(document, response.getOutputStream());
-
-        List<Student> students = studentRepository.findAll();
-        List<StudentReadDTO> readDTOS = students.stream()
-                .map(Mapper::mappingStudentToReadDto)
-                .toList();
-
-        document.open();
-
-        // Title
-        Font fontTitle = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 20);
-        Paragraph title = new Paragraph("Student List", fontTitle);
-        title.setAlignment(Element.ALIGN_CENTER);
-        document.add(title);
-        document.add(Chunk.NEWLINE);
-
-        // Table setup
-        PdfPTable table = new PdfPTable(7);
-        table.setWidthPercentage(100);
-        table.setSpacingBefore(10f);
-        table.setSpacingAfter(10f);
-        table.setWidths(new float[]{1f, 2f, 2f, 4f, 4f, 2f, 3f}); // last column for image/download link
-
-        // Table headers
-        Stream.of("ID", "Firstname", "Lastname", "Username", "Email", "Status", "Image/Download Link")
-                .forEach(headerTitle -> {
-                    PdfPCell header = new PdfPCell();
-                    Font headFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-                    header.setPhrase(new Phrase(headerTitle, headFont));
-                    header.setHorizontalAlignment(Element.ALIGN_CENTER);
-                    table.addCell(header);
-                });
-
-        // Table rows
-        for (StudentReadDTO student : readDTOS) {
-            table.addCell(String.valueOf(student.getId()));
-            table.addCell(student.getFirstname());
-            table.addCell(student.getLastname());
-            table.addCell(student.getUser().getUsername());
-            table.addCell(student.getUser().getEmail());
-            table.addCell(student.getUser().getStatus().toString());
-
-            ImageReadDTO img = student.getUser().getImage();
-            if (img != null && img.getDownloadUrl() != null) {
-                // Add download URL as text (optional: you could fetch bytes and embed image if needed)
-                table.addCell(img.getDownloadUrl());
-            } else {
-                table.addCell(""); // empty if no image
-            }
-        }
-
-        document.add(table);
-        document.close();
-    }
 
 
     /**Creates a PDF with all the students
@@ -133,7 +48,7 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
      * @throws com.itextpdf.text.BadElementException
      */
     @Override
-    public void allStudentsWithImage(HttpServletResponse response) throws IOException, DocumentException, com.itextpdf.text.BadElementException {
+    public void allStudents(HttpServletResponse response) throws IOException, DocumentException, com.itextpdf.text.BadElementException {
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=students.pdf");
 
@@ -211,7 +126,7 @@ public class PDFGeneratorServiceImpl implements IPDFGeneratorService{
      * @throws com.itextpdf.text.BadElementException
      */
     @Override
-    public void allTeachersWithImage(HttpServletResponse response) throws IOException, DocumentException, com.itextpdf.text.BadElementException {
+    public void allTeachers(HttpServletResponse response) throws IOException, DocumentException, com.itextpdf.text.BadElementException {
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=teachers.pdf");
 

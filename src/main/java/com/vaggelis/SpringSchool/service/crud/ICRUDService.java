@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface ICRUDService {
     JWTAuthenticationResponse SignIn(SignInRequest request);
-    void logout(String email);
     User findUserByEmail(String email) throws UserNotFoundException;
     List<User> findAllUsers();
     User changeStatus(Long id) throws UserNotFoundException;

@@ -43,12 +43,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TeacherController {
 
-    private final ICRUDService crudService;
     private final IStudentService studentService;
     private final ITeacherService teacherService;
     private final SignUpValidator signUpValidator;
     private final UpdateValidator updateValidator;
-    private final PasswordEncoder passwordEncoder;
 
 
 

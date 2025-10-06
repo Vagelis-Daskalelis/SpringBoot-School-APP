@@ -31,13 +31,10 @@ public class SecurityConfiguration {
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
     private final IUserService userService;
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors((cors) -> {
-                    corsConfigurationSource();
-                })
+                .cors(cors -> corsConfigurationSource())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
@@ -46,14 +43,20 @@ public class SecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()
+
+                        // Public endpoints
                         .requestMatchers("/api/user/**").permitAll()
-                        .requestMatchers("/api/image/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
-                        .requestMatchers("/api/student/**").hasAuthority("STUDENT")
-                        .requestMatchers("/api/pdf/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT")
-                        .requestMatchers("/api/teacher/**").hasAnyAuthority("ADMIN", "TEACHER")
-                        .requestMatchers("/api/course/**").hasAuthority("ADMIN")
-                        .requestMatchers("/api/speciality/**").hasAnyAuthority("ADMIN")
-                        .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN")
+
+                        // Requires role + ACTIVE status
+                        .requestMatchers("/api/image/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT", "ACTIVE")
+                        .requestMatchers("/api/student/**").hasAnyAuthority("STUDENT", "ACTIVE")
+                        .requestMatchers("/api/pdf/**").hasAnyAuthority("ADMIN", "TEACHER", "STUDENT", "ACTIVE")
+                        .requestMatchers("/api/teacher/**").hasAnyAuthority("ADMIN", "TEACHER", "ACTIVE")
+                        .requestMatchers("/api/course/**").hasAnyAuthority("ADMIN", "ACTIVE")
+                        .requestMatchers("/api/speciality/**").hasAnyAuthority("ADMIN", "ACTIVE")
+                        .requestMatchers("/api/admin/**").hasAnyAuthority("ADMIN", "ACTIVE")
+
+                        // Everything else must be authenticated
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -84,7 +87,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://codingfactory.aueb.gr", "http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
         configuration.setAllowedMethods(List.of("*")); // List.of("GET","POST")
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

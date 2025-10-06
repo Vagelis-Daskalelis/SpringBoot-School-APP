@@ -7,8 +7,6 @@ import com.vaggelis.SpringSchool.mapper.Mapper;
 import com.vaggelis.SpringSchool.models.Student;
 import com.vaggelis.SpringSchool.service.student.IStudentService;
 import com.vaggelis.SpringSchool.validator.user.PatchValidator;
-import com.vaggelis.SpringSchool.validator.user.SignUpValidator;
-import com.vaggelis.SpringSchool.validator.user.UpdateValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,9 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
 
     private final IStudentService studentService;
-    private final SignUpValidator validator;
-    private final UpdateValidator updateValidator;
-    private final PasswordEncoder passwordEncoder;
     private final PatchValidator patchValidator;
 
 
@@ -142,51 +136,7 @@ public class StudentController {
         // Method logic ends here
         // ---------------------------
     }
-
-
-//    @GetMapping("/profile")
-//    public ResponseEntity<Student> getProfile() {
-//        return ResponseEntity.ok(studentService.seeYourProfile());
-//    }
+    
 }
 
 
-/**
- *
- * @PutMapping("/user/your/update/{id}")
- *     public ResponseEntity<User> updateYourUser(@Valid @PathVariable Long id,
- *                                            @RequestBody UpdateRequest request,
- *                                            Authentication authentication,
- *                                                BindingResult bindingResult) {
- *         validator.validate(request, bindingResult);
- *         if (bindingResult.hasErrors()){
- *             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
- *         }
- *
- *         User currentUser = (User) authentication.getPrincipal();
- *         Long currentUserId = currentUser.getId();
- *
- *         try {
- *             User updatedUser = usersCrudService.updateYourUser(request, id, currentUserId);
- *             return new ResponseEntity<>(currentUser, HttpStatus.OK);
- *         } catch (UserNotFoundException e) {
- *             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
- *         }
- *     }
- *
- *     @DeleteMapping("/user/your/delete/{id}")
- *     public ResponseEntity<User> deleteYourUser(@PathVariable Long id,
- *                                            Authentication authentication){
- *         User currentUser = (User) authentication.getPrincipal();
- *         Long currentUserId = currentUser.getId();
- *
- *
- *         try {
- *             User deleted = usersCrudService.deleteYourUser(id, currentUserId);
- *             return ResponseEntity.ok(deleted);
- *         } catch (UserNotFoundException e) {
- *             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
- *         }
- *
- *     }
- */

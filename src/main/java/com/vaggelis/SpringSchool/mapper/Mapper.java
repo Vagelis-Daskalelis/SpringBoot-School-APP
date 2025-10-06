@@ -88,12 +88,6 @@ private Mapper() {} // prevent instantiation
     }
 
 
-//    //Map to update a Student
-//    public static Student extractStudentFromUpdateRequest(UpdateRequest request, User user){
-//        return new Student(request.getId(), request.getFirstname(), request.getLastname(), user);
-//    }
-
-
     //Maps Patch request to the student
     public static void patchStudentFromRequest(Student student, PatchRequest request) {
         student.setFirstname(request.getFirstname());
@@ -153,12 +147,6 @@ private Mapper() {} // prevent instantiation
 
         return dto;
     }
-
-
-    //Maps User to UserReadDto
-    //public static UserReadDTO mappingUserToReadDto(User user){
-        //return new UserReadDTO(user.getId(), user.getUsername(), user.getEmail(), user.getPassword(), user.getRole(), user.getStatus(), user.getImage());
-            //}
 
     //Maps Update request to the user
     public static void updateUserFromRequest(User user, UpdateRequest request, PasswordEncoder passwordEncoder){

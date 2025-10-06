@@ -16,7 +16,6 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class ImageServiceImpl implements IImageService{
 
     private final IImageRepository imageRepository;
@@ -93,43 +92,6 @@ public class ImageServiceImpl implements IImageService{
             throw new RuntimeException("Failed to save image: " + e.getMessage());
         }
     }
-
-
-//    @Override
-//    public void addYourImage(MultipartFile file) {
-//        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-//        log.info("Starting image upload for user: {}", currentUserEmail);
-//
-//        try {
-//            User currentUser = userRepository.findByEmail(currentUserEmail)
-//                    .orElseThrow(() -> {
-//                        log.error("User with email {} not found", currentUserEmail);
-//                        return new RuntimeException("User not found");
-//                    });
-//            log.info("User found: id={}, email={}", currentUser.getId(), currentUser.getEmail());
-//
-//            Image image = new Image();
-//            image.setFileName(file.getOriginalFilename());
-//            image.setFileType(file.getContentType());
-//            image.setImage(file.getBytes());
-//            log.info("Image prepared: filename={}, type={}, size={} bytes",
-//                    image.getFileName(), image.getFileType(),
-//                    image.getImage() != null ? image.getImage().length : 0);
-//
-//            Image savedImage = imageRepository.save(image);
-//            log.info("Image saved: id={}, filename={}", savedImage.getId(), savedImage.getFileName());
-//
-//            currentUser.addImage(savedImage);
-//            log.info("Image linked to user: userId={}, imageId={}", currentUser.getId(), savedImage.getId());
-//
-//            userRepository.save(currentUser);
-//            log.info("User updated successfully with new image. userId={}", currentUser.getId());
-//
-//        } catch (IOException e) {
-//            log.error("Failed to read file bytes: {}", e.getMessage(), e);
-//            throw new RuntimeException("Failed to save image: " + e.getMessage());
-//        }
-//    }
 
     /**Updates your users image
      *

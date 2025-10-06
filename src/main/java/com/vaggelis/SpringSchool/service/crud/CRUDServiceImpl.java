@@ -20,7 +20,6 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class CRUDServiceImpl implements ICRUDService {
 
     private final IUserRepository userRepository;
@@ -42,23 +41,9 @@ public class CRUDServiceImpl implements ICRUDService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
         var jwt = ijwtService.generateToken(user);
-        log.info("User logged in {} with email: " , request.getEmail());
         return  JWTAuthenticationResponse.builder().token(jwt).build();
     }
 
-
-
-    //Logs out
-    @Override
-    public void logout(String email) {
-        Optional<User> userOpt = userRepository.findByEmail(email);
-        if (userOpt.isPresent()){
-            User user = userOpt.get();
-            log.info("User logged out: {}", email);
-        }else {
-            throw new IllegalArgumentException("User not found with email: " + email);
-        }
-    }
 
     /**
      * Creates Teacher and a user with ADMIN role
@@ -85,10 +70,8 @@ public class CRUDServiceImpl implements ICRUDService {
            teacherRepository.save(teacher);
 
             System.out.println("Admin created successfully");
-            log.info("Admin created successfully");
         }else {
             System.out.println("Admin already exists");
-            log.info("Admin already exists");
         }
     }
 

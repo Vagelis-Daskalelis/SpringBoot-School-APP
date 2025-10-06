@@ -27,10 +27,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final ICRUDService crudService;
-    private final SignUpValidator validator;
-    private final PasswordEncoder passwordEncoder;
     private final IPasswordResetService passwordResetService;
-    private final IImageService imageService;
+
 
 
     // ===========================
@@ -151,75 +149,5 @@ public class UserController {
         // Method logic ends here
         // ---------------------------
     }
-
-
-    // ===========================
-    // Swagger Documentation
-    // ===========================
-    @Operation(
-            summary = "Logout user (ALL)",
-            description = "Logs out the currently authenticated user"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "User logged out successfully",
-                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
-            ),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "User is not authenticated",
-                    content = @Content(mediaType = MediaType.TEXT_PLAIN_VALUE)
-            )
-    })
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(
-            @Parameter(
-                    description = "Authentication object representing the current user",
-                    required = false
-            )
-            Authentication authentication) {
-        // ---------------------------
-        // Method logic starts here
-        // ---------------------------
-
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not authenticated");
-        }
-
-        String email = authentication.getName(); // Gets the email from the JWT's subject
-        crudService.logout(email);
-
-        return ResponseEntity.ok("User logged out successfully");
-        // ---------------------------
-        // Method logic ends here
-        // ---------------------------
-    }
-
-//    @PostMapping("/upload")
-//    public ResponseEntity<String> saveImages(@RequestParam("file") MultipartFile file) {
-//        try {
-//            imageService.addYourImage(file);
-//            return ResponseEntity.ok("Image added");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Upload failed!");
-//        }
-//    }
-
-//    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    @Operation(summary = "Upload an image")
-//    public ResponseEntity<String> saveImages(
-//            @Parameter(description = "File to upload")
-//            @RequestParam("file") MultipartFile file) {
-//        try {
-//            imageService.addYourImage(file);
-//            return ResponseEntity.ok("Image added");
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Upload failed!");
-//        }
-//    }
-
 
 }

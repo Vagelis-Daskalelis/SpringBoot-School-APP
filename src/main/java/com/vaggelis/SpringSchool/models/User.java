@@ -2,7 +2,6 @@ package com.vaggelis.SpringSchool.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,12 +33,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-//    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-//    private Teacher teacher;
-//
-//    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
-//    private Student student;
-
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Image image;
@@ -54,7 +47,8 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(role.name()),
+                        new SimpleGrantedAuthority(status.name()));
     }
 
     @Override
@@ -84,7 +78,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.status == Status.ACTIVE;
     }
 
 
@@ -132,16 +126,4 @@ public class User implements UserDetails {
     public void addImage(Image image){
         this.image = image;
     }
-
-    //    // --- Lifecycle callbacks ---
-//    @PrePersist
-//    public void onCreate() {
-//        this.createdAt = LocalDateTime.now();
-//        this.updatedAt = LocalDateTime.now();
-//    }
-//
-//    @PreUpdate
-//    public void onUpdate() {
-//        this.updatedAt = LocalDateTime.now();
-//    }
 }

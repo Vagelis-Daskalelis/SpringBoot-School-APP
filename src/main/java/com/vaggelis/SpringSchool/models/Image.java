@@ -19,9 +19,6 @@ public class Image {
     private String fileName;
     private String fileType;
 
-
-    //@Lob
-    //private Blob image;
     @Lob
     private byte[] image;
     private String downloadUrl;

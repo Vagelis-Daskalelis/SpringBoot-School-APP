@@ -23,38 +23,7 @@ public class PDFGeneratorController {
 
     private final IPDFGeneratorService pdfGeneratorService;
 
-    @GetMapping("/generate")
-    public void generatePDF(HttpServletResponse response) throws IOException {
-        response.setContentType("application/pdf");
-        DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy:hh:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
 
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
-
-        response.setHeader(headerKey, headerValue);
-
-        this.pdfGeneratorService.export(response);
-    }
-
-    @GetMapping("/students")
-    public void StudentsPDF(HttpServletResponse response) throws IOException{
-        // ---------------------------
-        // Method logic starts here
-        // ---------------------------
-        DateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyy:hh:mm:ss");
-        String currentDateTime = dateFormatter.format(new Date());
-
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=pdf_" + currentDateTime + ".pdf";
-
-        response.setHeader(headerKey, headerValue);
-
-        this.pdfGeneratorService.allStudents(response);
-        // ---------------------------
-        // Method logic ends here
-        // ---------------------------
-    }
 
     // ===========================
     // Swagger Documentation
@@ -81,7 +50,7 @@ public class PDFGeneratorController {
 
         response.setHeader(headerKey, headerValue);
 
-        this.pdfGeneratorService.allStudentsWithImage(response);
+        this.pdfGeneratorService.allStudents(response);
         // ---------------------------
         // Method logic ends here
         // ---------------------------
@@ -112,7 +81,7 @@ public class PDFGeneratorController {
 
         response.setHeader(headerKey, headerValue);
 
-        this.pdfGeneratorService.allTeachersWithImage(response);
+        this.pdfGeneratorService.allTeachers(response);
         // ---------------------------
         // Method logic ends here
         // ---------------------------

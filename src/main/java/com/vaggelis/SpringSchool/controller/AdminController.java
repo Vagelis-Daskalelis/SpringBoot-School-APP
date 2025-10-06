@@ -49,7 +49,6 @@ public class AdminController {
     private final ITeacherService teacherService;
     private final SignUpValidator validator;
     private final UpdateValidator updateValidator;
-    private final PasswordEncoder passwordEncoder;
 
     // ===========================
     // Swagger Documentation

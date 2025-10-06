@@ -12,18 +12,15 @@ import com.vaggelis.SpringSchool.repository.IStudentRepository;
 import com.vaggelis.SpringSchool.repository.IUserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class StudentServiceImpl implements IStudentService{
 
     private final IUserRepository userRepository;
@@ -56,11 +53,7 @@ public class StudentServiceImpl implements IStudentService{
 
             student.addUser(user);
             studentRepository.save(student);
-
-            log.info("Student user added: {}", user.getEmail());
-            log.info("Student added: {}, {}" , student.getFirstname(), student.getLastname());
         }catch (StudentAlreadyExistsException e){
-            log.error(e.getMessage());
             throw e;
         }
         return student;
@@ -301,61 +294,3 @@ public class StudentServiceImpl implements IStudentService{
 
 }
 
-
-//Even simpler (no targetId)
-//
-//If the endpoint is only for the logged-in student, you can drop targetId completely:
-//    @Override
-//    public Student seeYourProfile() throws StudentNotFoundException {
-//        String currentUserEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-//
-//        User currentUser = userRepository.findByEmail(currentUserEmail)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
-//
-//        return studentRepository.findByUser(currentUser)
-//                .orElseThrow(() -> new StudentNotFoundException(Student.class, currentUser.getId()));
-//    }
-
-
-/**
- *     // updates the user that you are logged in
- *     @Override
- *     public User updateYourUser(UpdateRequest request, Long targetUserId, Long currentUserId) throws UserNotFoundException {
- *         if (!targetUserId.equals(currentUserId)){
- *             throw new SecurityException("You are not authorized to update this user.");
- *         }
- *         User targetUser = null;
- *         try {
- *             targetUser = userRepository.findById(targetUserId)
- *                     .orElseThrow(() -> new UserNotFoundException(User.class, targetUserId));
- *
- *             targetUser.setUname(request.getUname());
- *             targetUser.setEmail(request.getEmail());
- *             targetUser.setPassword(passwordEncoder.encode(request.getPassword()));
- *
- *             userRepository.save(targetUser);
- *         } catch (UserNotFoundException e) {
- *             throw e;
- *         }
- *
- *         return targetUser;
- *     }
- *
- *     // deletes the user that you are logged in
- *     @Override
- *     public User deleteYourUser(Long targetUserId, Long currentUserId) throws UserNotFoundException {
- *         if (!targetUserId.equals(currentUserId)){
- *             throw new SecurityException("You are not authorized to update this user.");
- *         }
- *         try {
- *             User targetUser = userRepository.findById(targetUserId)
- *                     .orElseThrow(() -> new UserNotFoundException(User.class, targetUserId));
- *
- *             userRepository.delete(targetUser);
- *             return targetUser;
- *         } catch (UserNotFoundException e) {
- *             throw e;
- *         }
- *
- *     }
- */
