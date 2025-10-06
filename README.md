@@ -8,11 +8,11 @@
 
 ## 📦 Dependencies
 ### <!-- JWT -->
-### <dependency>
-###     <groupId>io.jsonwebtoken</groupId>
-###     <artifactId>jjwt-api</artifactId>
-###     <version>${jjwt.version}</version>
-### </dependency>
+ <dependency>
+     <groupId>io.jsonwebtoken</groupId>
+     <artifactId>jjwt-api</artifactId>
+     <version>${jjwt.version}</version>
+ </dependency>
 ### <dependency>
 ###     <groupId>io.jsonwebtoken</groupId>
 ###     <artifactId>jjwt-impl</artifactId>
